@@ -1,0 +1,251 @@
+name: Build APK
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Generate Android project around index.html
+        run: |
+          mkdir -p app/src/main/assets app/src/main/java/com/example/capitals
+          cp index.html app/src/main/assets/index.html
+          cat > settings.gradle <<'EOF_0'
+          pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
+          dependencyResolutionManagement { repositories { google(); mavenCentral() } }
+          rootProject.name = "WorldCapitals"
+          include ':app'
+          EOF_0
+          cat > build.gradle <<'EOF_1'
+          plugins { id 'com.android.application' version '8.5.2' apply false }
+          EOF_1
+          cat > gradle.properties <<'EOF_2'
+          android.useAndroidX=false
+          org.gradle.jvmargs=-Xmx2g
+          EOF_2
+          cat > app/build.gradle <<'EOF_3'
+          plugins { id 'com.android.application' }
+          android {
+              namespace 'com.example.capitals'
+              compileSdk 34
+              defaultConfig {
+                  applicationId 'com.example.capitals'
+                  minSdk 21
+                  targetSdk 34
+                  versionCode 1
+                  versionName '1.0'
+              }
+              compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
+          }
+          EOF_3
+          cat > app/src/main/AndroidManifest.xml <<'EOF_4'
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.INTERNET"/>
+              <application android:label="World Capitals" android:allowBackup="true"
+                  android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
+                  <activity android:name=".MainActivity" android:exported="true"
+                      android:configChanges="orientation|screenSize|keyboardHidden">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
+                      </intent-filter>
+                  </activity>
+              </application>
+              <queries><intent><action android:name="android.intent.action.TTS_SERVICE"/></intent></queries>
+          </manifest>
+          EOF_4
+          cat > app/src/main/java/com/example/capitals/MainActivity.java <<'EOF_5'
+          package com.example.capitals;
+
+          import android.app.Activity;
+          import android.content.Intent;
+          import android.net.Uri;
+          import android.os.Bundle;
+          import android.speech.tts.TextToSpeech;
+          import android.webkit.*;
+          import android.widget.Toast;
+          import org.json.JSONObject;
+          import java.io.*;
+          import java.net.HttpURLConnection;
+          import java.net.URL;
+          import java.nio.charset.StandardCharsets;
+          import java.util.Locale;
+
+          public class MainActivity extends Activity {
+              static final int PICK = 1, SAVE = 2, SYNC_OPEN = 3, SYNC_NEW = 4;
+              WebView web;
+              TextToSpeech tts;
+              ValueCallback<Uri[]> chooser;
+              String pending;
+
+              class Bridge {
+                  @JavascriptInterface public void speak(String t) { speakLang(t, "en-US"); }
+                  @JavascriptInterface public void speakLang(String t, String lang) {
+                      if (tts == null) return;
+                      final Locale loc = Locale.forLanguageTag(lang);
+                      int r = tts.setLanguage(loc);
+                      if (r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED) {
+                          runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                              "No text-to-speech voice installed for " + loc.getDisplayLanguage(), Toast.LENGTH_LONG).show());
+                          return;
+                      }
+                      tts.setSpeechRate(lang.startsWith("en") ? 0.85f : 0.9f);
+                      if (t.length() > 3500) t = t.substring(0, 3500);
+                      tts.speak(t, TextToSpeech.QUEUE_FLUSH, null, "u");
+                  }
+                  @JavascriptInterface public void httpGet(final String url, final String id) {
+                      new Thread(() -> {
+                          String res = null;
+                          try {
+                              HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+                              c.setConnectTimeout(10000); c.setReadTimeout(15000);
+                              c.setRequestProperty("User-Agent", "WorldCapitalsApp/1.0");
+                              BufferedReader r = new BufferedReader(new InputStreamReader(c.getInputStream(), StandardCharsets.UTF_8));
+                              StringBuilder sb = new StringBuilder(); String l;
+                              while ((l = r.readLine()) != null) sb.append(l).append('\n');
+                              r.close(); res = sb.toString();
+                          } catch (Exception e) { res = null; }
+                          final String out = res;
+                          runOnUiThread(() -> web.evaluateJavascript(
+                              "window.__cb('" + id + "'," + (out == null ? "null" : JSONObject.quote(out)) + ")", null));
+                      }).start();
+                  }
+                  @JavascriptInterface public boolean hasSync() { return syncUri() != null; }
+                  @JavascriptInterface public void clearSync() {
+                      getSharedPreferences("wc", MODE_PRIVATE).edit().remove("sync").apply();
+                  }
+                  @JavascriptInterface public void pickSync(final String mode) {
+                      runOnUiThread(() -> {
+                          boolean create = "create".equals(mode);
+                          Intent i = new Intent(create ? Intent.ACTION_CREATE_DOCUMENT : Intent.ACTION_OPEN_DOCUMENT)
+                              .addCategory(Intent.CATEGORY_OPENABLE)
+                              .setType(create ? "application/json" : "*/*")
+                              .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                                  | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+                          if (create) i.putExtra(Intent.EXTRA_TITLE, "capitals-sync.json");
+                          startActivityForResult(i, create ? SYNC_NEW : SYNC_OPEN);
+                      });
+                  }
+                  @JavascriptInterface public void readSync(final String id) {
+                      new Thread(() -> {
+                          try {
+                              Uri u = syncUri();
+                              if (u == null) throw new IOException("no sync file");
+                              InputStream in = getContentResolver().openInputStream(u);
+                              ByteArrayOutputStream bo = new ByteArrayOutputStream();
+                              byte[] buf = new byte[8192]; int n;
+                              while ((n = in.read(buf)) > 0) bo.write(buf, 0, n);
+                              in.close();
+                              nat(id, true, bo.toString("UTF-8"));
+                          } catch (Exception e) { nat(id, false, String.valueOf(e.getMessage())); }
+                      }).start();
+                  }
+                  @JavascriptInterface public void writeSync(final String text, final String id) {
+                      new Thread(() -> {
+                          try {
+                              Uri u = syncUri();
+                              if (u == null) throw new IOException("no sync file");
+                              OutputStream o = getContentResolver().openOutputStream(u, "wt");
+                              o.write(text.getBytes(StandardCharsets.UTF_8));
+                              o.close();
+                              nat(id, true, "");
+                          } catch (Exception e) { nat(id, false, String.valueOf(e.getMessage())); }
+                      }).start();
+                  }
+                  @JavascriptInterface public void saveFile(String name, String text) {
+                      pending = text;
+                      runOnUiThread(() -> {
+                          Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT)
+                              .addCategory(Intent.CATEGORY_OPENABLE).setType("application/json")
+                              .putExtra(Intent.EXTRA_TITLE, name);
+                          startActivityForResult(i, SAVE);
+                      });
+                  }
+              }
+
+              Uri syncUri() {
+                  String s = getSharedPreferences("wc", MODE_PRIVATE).getString("sync", null);
+                  return s == null ? null : Uri.parse(s);
+              }
+
+              void nat(final String id, final boolean ok, final String text) {
+                  runOnUiThread(() -> web.evaluateJavascript(
+                      "window.__nat('" + id + "'," + ok + "," + JSONObject.quote(text) + ")", null));
+              }
+
+              @Override protected void onCreate(Bundle b) {
+                  super.onCreate(b);
+                  tts = new TextToSpeech(this, st -> {
+                      if (st == TextToSpeech.SUCCESS) tts.setLanguage(Locale.US);
+                  });
+                  web = new WebView(this);
+                  setContentView(web);
+                  WebSettings s = web.getSettings();
+                  s.setJavaScriptEnabled(true);
+                  s.setDomStorageEnabled(true);
+                  web.addJavascriptInterface(new Bridge(), "Android");
+                  web.setWebViewClient(new WebViewClient() {
+                      @Override public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest rq) {
+                          Uri u = rq.getUrl();
+                          if ("http".equals(u.getScheme()) || "https".equals(u.getScheme())) {
+                              startActivity(new Intent(Intent.ACTION_VIEW, u));
+                              return true;
+                          }
+                          return false;
+                      }
+                  });
+                  web.setWebChromeClient(new WebChromeClient() {
+                      @Override public boolean onShowFileChooser(WebView v, ValueCallback<Uri[]> cb, FileChooserParams p) {
+                          if (chooser != null) chooser.onReceiveValue(null);
+                          chooser = cb;
+                          try { startActivityForResult(p.createIntent(), PICK); }
+                          catch (Exception e) { chooser = null; return false; }
+                          return true;
+                      }
+                  });
+                  web.loadUrl("file:///android_asset/index.html");
+              }
+
+              @Override protected void onActivityResult(int rq, int rs, Intent d) {
+                  if (rq == PICK && chooser != null) {
+                      chooser.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(rs, d));
+                      chooser = null;
+                  } else if ((rq == SYNC_OPEN || rq == SYNC_NEW) && rs == RESULT_OK && d != null && d.getData() != null) {
+                      Uri u = d.getData();
+                      try {
+                          getContentResolver().takePersistableUriPermission(u,
+                              Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                      } catch (Exception e) { }
+                      getSharedPreferences("wc", MODE_PRIVATE).edit().putString("sync", u.toString()).apply();
+                      web.evaluateJavascript("window.__picked&&window.__picked()", null);
+                  } else if (rq == SAVE && rs == RESULT_OK && d != null && d.getData() != null && pending != null) {
+                      try (OutputStream o = getContentResolver().openOutputStream(d.getData())) {
+                          o.write(pending.getBytes(StandardCharsets.UTF_8));
+                          Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
+                      } catch (Exception e) { Toast.makeText(this, "Save failed", Toast.LENGTH_SHORT).show(); }
+                      pending = null;
+                  }
+              }
+
+              @Override protected void onPause() { super.onPause(); if (web != null) web.evaluateJavascript("window.__vis&&window.__vis(false)", null); }
+              @Override protected void onResume() { super.onResume(); if (web != null) web.evaluateJavascript("window.__vis&&window.__vis(true)", null); }
+
+              @Override public void onBackPressed() { finish(); }
+              @Override protected void onDestroy() { if (tts != null) tts.shutdown(); super.onDestroy(); }
+          }
+          EOF_5
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.7
+      - name: Build debug APK
+        run: gradle assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WorldCapitals-apk
+          path: app/build/outputs/apk/debug/app-debug.apk

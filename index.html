@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>World Capitals</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f4ef;--card:#fff;--ink:#1d2433;--mute:#6b7280;--acc:#0f766e;--accbg:#d9f0ec;--ok:#15803d;--okbg:#dcf5e3;--bad:#b91c1c;--badbg:#fbe0e0;--line:#e3dfd6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161d;--card:#1b212b;--ink:#e8ebf0;--mute:#9aa3b2;--acc:#5eead4;--accbg:#173a37;--ok:#6ee79a;--okbg:#14301f;--bad:#fca5a5;--badbg:#3a1a1a;--line:#2a3240}}
+:root[data-theme="dark"]{--bg:#12161d;--card:#1b212b;--ink:#e8ebf0;--mute:#9aa3b2;--acc:#5eead4;--accbg:#173a37;--ok:#6ee79a;--okbg:#14301f;--bad:#fca5a5;--badbg:#3a1a1a;--line:#2a3240}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif}
+.w{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:28px;margin:0 0 4px}
+.sub{color:var(--mute);font-family:system-ui,sans-serif;font-size:14px;margin:0 0 18px}
+.tabs{display:flex;gap:8px;margin-bottom:16px;font-family:system-ui,sans-serif}
+.tab,.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 18px;border-radius:999px;font-size:15px;cursor:pointer;font-family:system-ui,sans-serif}
+.tab.on,.btn.pri{background:var(--acc);color:var(--onacc,var(--bg));border-color:var(--acc);font-weight:600}
+input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:16px;margin-bottom:14px;font-family:system-ui,sans-serif}
+.row{display:flex;flex-wrap:wrap;gap:6px 24px;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.cell{display:flex;align-items:center;gap:8px;min-width:230px;flex:1}
+.lbl{font-family:system-ui,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);display:block}
+.nm{font-size:18px}
+.nm bdi{font-family:system-ui,Tahoma,sans-serif;color:var(--mute);font-size:16px}
+.spk{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--accbg);color:var(--acc);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.spk svg{width:18px;height:18px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.bar{height:6px;background:var(--line);border-radius:3px;margin-bottom:14px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc);transition:width .3s}
+.meta{font-family:system-ui,sans-serif;font-size:13px;color:var(--mute);display:flex;justify-content:space-between;margin-bottom:8px}
+.qt{font-size:22px;margin:6px 0 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;cursor:pointer;background:var(--bg)}
+.opt.ok{background:var(--okbg);border-color:var(--ok)}
+.opt.bad{background:var(--badbg);border-color:var(--bad)}
+.opt.lock{cursor:default}
+.res{text-align:center;padding:20px 0}
+.res b{font-size:44px;display:block;color:var(--acc)}
+.fb{font-family:system-ui,sans-serif;margin:8px 0 12px;min-height:22px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.st{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;font-family:system-ui,sans-serif;font-size:13px;color:var(--mute)}
+.st b{display:block;font-size:26px;color:var(--acc)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-family:system-ui,sans-serif;font-size:14px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}small{color:var(--mute)}h3{font-family:system-ui,sans-serif;margin:18px 0 8px}
+.modes{display:flex;gap:8px;margin-bottom:12px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.fg .opt{margin:0;justify-content:center;padding:14px}
+.fl{font-size:56px;line-height:1.1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.ex{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:12px 14px;font-family:system-ui,sans-serif;font-size:14px;line-height:1.5;margin-bottom:12px}
+.ex ul{list-style:none;padding:0;margin:8px 0 0}.ex li{padding:8px;border-radius:8px;margin-bottom:6px}
+.ex li.g{background:var(--okbg)}.ex li.b{background:var(--badbg)}.ex .nm{font-size:15px}
+.mc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;font-family:system-ui,sans-serif}.mc b{display:block;margin-bottom:6px}.mc span{font-size:13px;color:var(--mute)}
+.pb{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-bottom:6px}.pb i{display:block;height:100%;background:var(--acc)}
+#ex ul{list-style:none;padding:0;margin:10px 0 0}#ex li{margin-bottom:10px;line-height:1.7}#ex li .spk{width:30px;height:30px;margin:0 6px;vertical-align:middle}
+.fe{font-size:24px;vertical-align:middle}.nr{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.bd{min-width:26px;text-align:center;background:var(--accbg);color:var(--acc);border-radius:999px;padding:2px 8px;font-family:system-ui,sans-serif;font-size:14px;font-weight:700}
+.btn.sm{padding:12px 26px;font-size:17px;font-weight:700;margin-top:10px;background:var(--acc);color:var(--onacc,var(--bg));border-color:var(--acc);min-height:46px}
+.ct{font-family:system-ui,sans-serif;font-size:12px;color:var(--mute);opacity:.7;letter-spacing:.04em;margin-top:2px}.qt+.ct{margin:-12px 0 14px}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:10px}
+.th{display:flex;align-items:center;gap:8px;padding:11px 10px;border-radius:12px;border:2px solid;font:600 13px system-ui,sans-serif;cursor:pointer;text-align:left}
+.th i{width:14px;height:14px;border-radius:50%;flex:none}.th.on{outline:3px solid var(--acc);outline-offset:2px}
+.wk{flex-basis:100%;width:100%;font-family:system-ui,sans-serif}.wk summary{cursor:pointer;color:var(--acc);font-weight:600;padding:4px 0}
+.boxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:8px}
+.wb{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg)}.wh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.wt{font-size:14px;line-height:1.7}.wt p{margin:0 0 8px}.wt a{color:var(--acc)}.wt small{color:var(--mute)}
+.tabs{flex-wrap:wrap}.btn:disabled{opacity:.5}
+#sbar{background:var(--badbg);color:var(--bad);border:1px solid var(--bad);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-family:system-ui,sans-serif;font-size:14px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.mbox{background:var(--card);color:var(--ink);border-radius:16px;padding:20px;max-width:420px;width:100%;font-family:system-ui,sans-serif}.mbox h3{margin-top:0}
+.mbtn{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.btn.dng{background:var(--bad);border-color:var(--bad);color:var(--bg)}
+.lh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex:1 1 100%}.lh .cell{min-width:0}.lh .btn.sm{margin-top:0;flex:none;padding:10px 18px;font-size:15px}
+.cbig{font-size:34px;font-weight:700;margin:6px 0 4px;display:flex;align-items:center;gap:10px}
+#cu{border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0;background:var(--card)}#cu h3{margin:0 0 6px}
+.swr{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}.sw{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}.sw.on{outline:3px solid var(--ink);outline-offset:2px}
+#cu input[type=color]{width:46px;height:38px;border:1px solid var(--line);border-radius:10px;padding:2px;background:var(--card);margin:0}
+.cb{flex:1 1 100%;font-family:system-ui,sans-serif}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:10px;padding:3px 4px 3px 10px;font-size:13px;background:var(--bg)}.chip .spk{width:26px;height:26px}.chip .spk svg{width:14px;height:14px}
+.tabs,.modes{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:8px;padding:2px 2px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.tabs .tab,.modes .tab{flex:none;white-space:nowrap;font-weight:800;font-size:16px;letter-spacing:.02em;padding:12px 22px;border:2px solid var(--acc);background:var(--accbg);color:var(--ink)}
+.modes .tab{font-size:14px;padding:9px 16px}
+.tabs .tab.on,.modes .tab.on{background:var(--acc);color:var(--onacc,var(--bg))}
+.cfa{font-family:system-ui,Tahoma,sans-serif;font-size:22px;font-weight:600;color:var(--mute);margin:-2px 0 10px;text-align:left}
+html[data-ds=glass] body{background:linear-gradient(135deg,var(--accbg),var(--bg) 55%,var(--accbg)) fixed}
+html[data-ds=glass] :is(.row,.q,.st,.mc,#cu,.cc){background:color-mix(in srgb,var(--card) 55%,transparent);-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%);border:1px solid color-mix(in srgb,var(--ink) 14%,transparent);box-shadow:0 8px 32px rgba(0,0,0,.12);border-radius:20px}
+html[data-ds=glass] :is(.opt,.chip,.wb,.btn,.tab):not(.pri):not(.sm):not(.on):not(.ok):not(.bad){background:color-mix(in srgb,var(--card) 40%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-color:color-mix(in srgb,var(--ink) 16%,transparent)}
+html[data-ds=material] :is(.row,.q,.st,.mc,#cu,.cc){border:0;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.22),0 3px 10px rgba(0,0,0,.12)}
+html[data-ds=material] :is(.btn,.tab){border-radius:20px;border-width:0;text-transform:uppercase;letter-spacing:.07em;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.28)}
+html[data-ds=material] :is(.opt,.chip){border:0;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+html[data-ds=flat] :is(.row,.q,.st,.mc,#cu,.cc,.opt,.chip,.wb,.btn,.tab){border-color:transparent;border-radius:2px;box-shadow:none}
+html[data-ds=flat] :is(.opt,.chip,.wb,.btn,.tab):not(.pri):not(.sm):not(.on):not(.ok):not(.bad){background:var(--accbg)}
+html[data-ds=flat] :is(.row,.q,.cc){background:var(--card)}
+html[data-ds=duo] body{font-family:"Nunito","Trebuchet MS",system-ui,sans-serif}
+html[data-ds=duo] :is(.row,.q,.st,.mc,#cu,.cc,.wb){border:2px solid var(--line);border-radius:18px;box-shadow:0 3px 0 var(--line)}
+html[data-ds=duo] :is(.btn,.tab,.opt){border:2px solid var(--line);border-bottom-width:5px;border-radius:16px;font-weight:800}
+html[data-ds=duo] :is(.btn,.tab){text-transform:uppercase;letter-spacing:.05em}
+html[data-ds=duo] :is(.btn.pri,.btn.sm,.tab.on){border-color:color-mix(in srgb,var(--acc) 65%,#000)}
+html[data-ds=duo] :is(.btn,.tab,.opt):active{transform:translateY(3px);border-bottom-width:2px}
+html[data-ds=neu] :is(.row,.q,.st,.mc,#cu,.cc){background:var(--bg);border:0;border-radius:22px;box-shadow:8px 8px 16px rgba(0,0,0,.18),-8px -8px 16px rgba(255,255,255,.08)}
+html[data-ds=neu] :is(.btn,.tab,.opt,.chip):not(.pri):not(.sm):not(.on):not(.ok):not(.bad){background:var(--bg);border:0;box-shadow:4px 4px 9px rgba(0,0,0,.18),-4px -4px 9px rgba(255,255,255,.08)}
+.sk{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;font-family:system-ui,sans-serif}
+.sk .big{font-size:44px;font-weight:800;color:var(--acc);line-height:1}.sk small{display:block;color:var(--mute)}
+.calh{display:flex;align-items:center;justify-content:space-between;margin:14px 0 8px;font-family:system-ui,sans-serif}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;font-family:system-ui,sans-serif}
+.cw{text-align:center;font-size:12px;color:var(--mute)}
+.cd{min-height:58px;border-radius:10px;padding:6px 2px;text-align:center;font-size:13px;font-weight:600;color:var(--mute)}
+.cd.on{background:var(--acc);color:var(--onacc,var(--bg))}.cd.on b{display:block;font-size:16px;margin-top:3px}.cd.td{outline:2px solid var(--acc);outline-offset:1px}
+.pop{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:70;padding:16px}.pop[hidden]{display:none}
+.pop .pbx{background:var(--card);color:var(--ink);border-radius:22px;padding:26px 24px;max-width:320px;text-align:center;font-family:system-ui,sans-serif}.pop .pbx div{font-size:54px}.pop h2{margin:6px 0}
+html[data-ds=brutal] :is(.row,.q,.st,.mc,#cu,.cc,.wb){border:3px solid var(--ink);border-radius:0;box-shadow:6px 6px 0 var(--ink)}
+html[data-ds=brutal] :is(.btn,.tab,.opt,.chip){border:3px solid var(--ink);border-radius:0;font-weight:800;box-shadow:3px 3px 0 var(--ink)}
+html[data-ds=mono] body{font-family:ui-monospace,Menlo,Consolas,monospace}
+html[data-ds=mono] :is(.row,.q,.st,.mc,#cu,.cc,.wb,.btn,.tab,.opt,.chip){border-radius:0;border:1px dashed var(--acc);box-shadow:none}
+html[data-ds=outline] :is(.row,.q,.st,.mc,#cu,.cc,.wb){background:transparent;border:2px solid var(--acc);border-radius:14px;box-shadow:none}
+html[data-ds=outline] :is(.btn,.tab,.opt,.chip):not(.pri):not(.sm):not(.on):not(.ok):not(.bad){background:transparent;border:2px solid var(--acc)}
+html[data-ds=aurora] body{background:radial-gradient(circle at 15% 10%,var(--accbg),transparent 45%),radial-gradient(circle at 85% 90%,var(--accbg),transparent 45%),var(--bg);background-attachment:fixed}
+html[data-ds=aurora] :is(.row,.q,.st,.mc,#cu,.cc){background:linear-gradient(135deg,var(--card),var(--accbg));border:0;border-radius:20px;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+html[data-ds=bubble] :is(.row,.q,.st,.mc,#cu,.cc,.wb){border-radius:32px;border:0;background:var(--accbg)}
+html[data-ds=bubble] :is(.btn,.tab,.opt,.chip){border-radius:999px;padding-left:20px;padding-right:20px}
+html[data-lo=compact] body{font-size:14px}html[data-lo=compact] .w{padding:10px 10px 32px}
+html[data-lo=compact] :is(.row,.q,.cc,.st,.mc){padding:8px 10px;margin-bottom:8px}html[data-lo=compact] :is(.btn,.tab){padding:6px 12px;font-size:13px}
+html[data-lo=large] body{font-size:19px}html[data-lo=large] :is(.btn,.tab,.opt){font-size:19px;padding:15px 22px;min-height:52px}html[data-lo=large] .nm{font-size:22px}
+html[data-lo=bottom] .w{padding-bottom:96px}
+html[data-lo=bottom] .tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;margin:0;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:2px solid var(--acc)}
+html[data-lo=minimal] :is(.ct,.lbl){display:none}
+@media(min-width:760px){html[data-lo=side] .w{max-width:880px;margin:0 auto 0 190px}
+html[data-lo=side] .tabs{position:fixed;left:0;top:0;bottom:0;width:170px;flex-direction:column;overflow-y:auto;padding:16px 10px;background:var(--card);border-right:2px solid var(--acc);margin:0}
+html[data-lo=grid] .w{max-width:1180px}html[data-lo=grid] #list{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:12px;align-items:start}}
+.hs{margin-top:8px}.hs summary{cursor:pointer;font-family:system-ui,sans-serif;font-size:14px;font-weight:700;color:var(--acc)}
+.he{padding:7px 0;border-bottom:1px solid var(--line);font-family:system-ui,sans-serif;font-size:14px}.he b{color:var(--acc)}
+.hfa{font-size:13px;color:var(--mute);font-family:system-ui,Tahoma,sans-serif;margin-top:3px;text-align:right}
+.hs{flex:1 1 100%;margin-top:10px;border:2px solid var(--acc);border-radius:12px;padding:10px 12px;background:var(--accbg)}
+.hs summary{font-size:15px}.hs.soon{font-family:system-ui,sans-serif;font-size:14px;font-weight:600;color:var(--mute);border-style:dashed;background:transparent}
+.sk{flex-direction:column;justify-content:center;text-align:center;gap:6px;padding:22px 16px}.sk .big{font-size:72px}.sk>div:last-child{width:100%}
+.cd{display:flex;flex-direction:column;align-items:center;justify-content:center}
+html[data-ds=glass] body{background:linear-gradient(135deg,color-mix(in srgb,var(--acc) 38%,var(--bg)),var(--bg) 48%,color-mix(in srgb,var(--acc) 26%,var(--bg))) fixed}
+html[data-ds=glass] :is(.row,.q,.st,.mc,#cu,.cc){background:color-mix(in srgb,var(--card) 42%,transparent);border:1px solid color-mix(in srgb,#fff 45%,transparent);box-shadow:0 10px 36px rgba(0,0,0,.18),inset 0 1px 0 color-mix(in srgb,#fff 55%,transparent)}
+html[data-ds=aurora] body{background:radial-gradient(circle at 12% 8%,color-mix(in srgb,var(--acc) 45%,transparent),transparent 42%),radial-gradient(circle at 88% 55%,color-mix(in srgb,var(--acc) 30%,transparent),transparent 45%),radial-gradient(circle at 20% 95%,color-mix(in srgb,var(--acc) 38%,transparent),transparent 45%),var(--bg);background-attachment:fixed}
+html[data-ds=aurora] :is(.row,.q,.st,.mc,#cu,.cc){background:linear-gradient(135deg,color-mix(in srgb,var(--card) 88%,transparent),color-mix(in srgb,var(--accbg) 80%,transparent));border:1px solid color-mix(in srgb,var(--acc) 35%,transparent)}
+html[data-ds=neu][data-mode=l] :is(.row,.q,.st,.mc,#cu,.cc){box-shadow:10px 10px 22px rgba(0,0,0,.2),-10px -10px 22px rgba(255,255,255,.9)}
+html[data-ds=neu][data-mode=l] :is(.btn,.tab,.opt,.chip):not(.pri):not(.sm):not(.on):not(.ok):not(.bad){box-shadow:5px 5px 10px rgba(0,0,0,.2),-5px -5px 10px rgba(255,255,255,.9)}
+html[data-ds=neu][data-mode=d] :is(.row,.q,.st,.mc,#cu,.cc){box-shadow:10px 10px 22px rgba(0,0,0,.55),-8px -8px 18px rgba(255,255,255,.07)}
+html[data-ds=flat] :is(.row,.q,.cc,.st,.mc){background:var(--card);border-left:6px solid var(--acc)}
+html[data-ds=flat] body{background:var(--bg)}
+.cd.on b{border-top:1px solid color-mix(in srgb,currentColor 45%,transparent);margin-top:4px;padding-top:3px}.cd.on i{display:block;font-size:10px;font-style:normal;font-weight:600;opacity:.85}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>World Capitals</h1>
+<p class="sub">Learn countries and their capitals. Tap the speaker to hear each name.</p>
+<div id="sbar" hidden></div><div class="tabs"><button class="tab on" id="t1">Learn</button><button class="tab" id="t2">Quiz</button><button class="tab" id="t3">Profile</button><button class="tab" id="t4">Settings</button><button class="tab" id="t5">🔥 Streak</button></div>
+<div id="learn"><input id="s" placeholder="Search country or capital…"><div id="list"></div></div>
+<div id="quiz" hidden></div><div id="prog" hidden></div><div id="set" hidden></div><div id="stk" hidden></div>
+</div>
+<script>
+const RAW=`Iran|ایران|Tehran|تهران
+Afghanistan|افغانستان|Kabul|کابل
+Turkey|ترکیه|Ankara|آنکارا
+Azerbaijan|آذربایجان|Baku|باکو
+Armenia|ارمنستان|Yerevan|ایروان
+Georgia|گرجستان|Tbilisi|تفلیس
+Iraq|عراق|Baghdad|بغداد
+Saudi Arabia|عربستان سعودی|Riyadh|ریاض
+United Arab Emirates|امارات متحده عربی|Abu Dhabi|ابوظبی
+Qatar|قطر|Doha|دوحه
+Kuwait|کویت|Kuwait City|شهر کویت
+Oman|عمان|Muscat|مسقط
+Jordan|اردن|Amman|عمان
+Lebanon|لبنان|Beirut|بیروت
+Syria|سوریه|Damascus|دمشق
+Egypt|مصر|Cairo|قاهره
+Pakistan|پاکستان|Islamabad|اسلام‌آباد
+India|هند|New Delhi|دهلی نو
+Bangladesh|بنگلادش|Dhaka|داکا
+China|چین|Beijing|پکن
+Japan|ژاپن|Tokyo|توکیو
+South Korea|کره جنوبی|Seoul|سئول
+Thailand|تایلند|Bangkok|بانکوک
+Vietnam|ویتنام|Hanoi|هانوی
+Indonesia|اندونزی|Jakarta|جاکارتا
+Malaysia|مالزی|Kuala Lumpur|کوالالامپور
+Kazakhstan|قزاقستان|Astana|آستانه
+Uzbekistan|ازبکستان|Tashkent|تاشکند
+Turkmenistan|ترکمنستان|Ashgabat|عشق‌آباد
+Tajikistan|تاجیکستان|Dushanbe|دوشنبه
+Russia|روسیه|Moscow|مسکو
+Ukraine|اوکراین|Kyiv|کی‌یف
+Poland|لهستان|Warsaw|ورشو
+Germany|آلمان|Berlin|برلین
+France|فرانسه|Paris|پاریس
+United Kingdom|بریتانیا|London|لندن
+Spain|اسپانیا|Madrid|مادرید
+Portugal|پرتغال|Lisbon|لیسبون
+Italy|ایتالیا|Rome|رم
+Greece|یونان|Athens|آتن
+Netherlands|هلند|Amsterdam|آمستردام
+Belgium|بلژیک|Brussels|بروکسل
+Switzerland|سوئیس|Bern|برن
+Austria|اتریش|Vienna|وین
+Sweden|سوئد|Stockholm|استکهلم
+Norway|نروژ|Oslo|اسلو
+Finland|فنلاند|Helsinki|هلسینکی
+Denmark|دانمارک|Copenhagen|کپنهاگ
+Ireland|ایرلند|Dublin|دوبلین
+Hungary|مجارستان|Budapest|بوداپست
+Czechia|چک|Prague|پراگ
+Romania|رومانی|Bucharest|بخارست
+United States|ایالات متحده|Washington, D.C.|واشنگتن
+Canada|کانادا|Ottawa|اتاوا
+Mexico|مکزیک|Mexico City|مکزیکوسیتی
+Brazil|برزیل|Brasília|برازیلیا
+Argentina|آرژانتین|Buenos Aires|بوئنوس آیرس
+Chile|شیلی|Santiago|سانتیاگو
+Colombia|کلمبیا|Bogotá|بوگوتا
+Peru|پرو|Lima|لیما
+Cuba|کوبا|Havana|هاوانا
+Australia|استرالیا|Canberra|کانبرا
+New Zealand|نیوزیلند|Wellington|ولینگتون
+South Africa|آفریقای جنوبی|Pretoria|پرتوریا
+Nigeria|نیجریه|Abuja|ابوجا
+Kenya|کنیا|Nairobi|نایروبی
+Ethiopia|اتیوپی|Addis Ababa|آدیس‌آبابا
+Morocco|مراکش|Rabat|رباط
+Algeria|الجزایر|Algiers|الجزیره`;
+const D=RAW.split("\n").map(l=>{const[c,cf,k,kf]=l.split("|");return{c,cf,k,kf}});
+const flag=c=>String.fromCodePoint(...[...c].map(ch=>127397+ch.charCodeAt(0)));
+"IR AF TR AZ AM GE IQ SA AE QA KW OM JO LB SY EG PK IN BD CN JP KR TH VN ID MY KZ UZ TM TJ RU UA PL DE FR GB ES PT IT GR NL BE CH AT SE NO FI DK IE HU CZ RO US CA MX BR AR CL CO PE CU AU NZ ZA NG KE ET MA DZ".split(" ").forEach((c,k)=>D[k].f=flag(c));
+const CONT={Asia:"Iran,Afghanistan,Turkey,Azerbaijan,Armenia,Georgia,Iraq,Saudi Arabia,United Arab Emirates,Qatar,Kuwait,Oman,Jordan,Lebanon,Syria,Pakistan,India,Bangladesh,China,Japan,South Korea,Thailand,Vietnam,Indonesia,Malaysia,Kazakhstan,Uzbekistan,Turkmenistan,Tajikistan",Europe:"Russia,Ukraine,Poland,Germany,France,United Kingdom,Spain,Portugal,Italy,Greece,Netherlands,Belgium,Switzerland,Austria,Sweden,Norway,Finland,Denmark,Ireland,Hungary,Czechia,Romania","North America":"United States,Canada,Mexico,Cuba","South America":"Brazil,Argentina,Chile,Colombia,Peru",Oceania:"Australia,New Zealand",Africa:"Egypt,South Africa,Nigeria,Kenya,Ethiopia,Morocco,Algeria"};
+D.forEach(d=>{d.ct=Object.keys(CONT).find(k=>CONT[k].split(",").includes(d.c))||""});
+const CITY_RAW=`Iran:Tehran,Mashhad,Isfahan,Karaj,Shiraz,Tabriz,Qom,Ahvaz,Kermanshah,Urmia,Rasht,Zahedan,Kerman,Arak,Yazd,Ardabil,Bandar Abbas,Hamadan,Qazvin,Sanandaj,Zanjan,Gorgan,Sari,Bushehr,Birjand
+Afghanistan:Kabul,Kandahar,Herat,Mazar-i-Sharif,Jalalabad,Kunduz,Ghazni,Lashkar Gah
+Turkey:Istanbul,Ankara,Izmir,Bursa,Adana,Gaziantep,Konya,Antalya,Kayseri,Mersin,Eskisehir,Diyarbakir,Samsun,Denizli,Trabzon,Erzurum,Malatya,Van,Sanliurfa,Sivas
+Azerbaijan:Baku,Ganja,Sumqayit,Mingachevir,Shirvan,Lankaran,Shaki,Nakhchivan
+Armenia:Yerevan,Gyumri,Vanadzor,Vagharshapat,Hrazdan
+Georgia:Tbilisi,Batumi,Kutaisi,Rustavi,Gori,Zugdidi
+Iraq:Baghdad,Basra,Mosul,Erbil,Kirkuk,Najaf,Karbala,Sulaymaniyah,Nasiriyah,Fallujah,Ramadi,Duhok
+Saudi Arabia:Riyadh,Jeddah,Mecca,Medina,Dammam,Khobar,Taif,Tabuk,Buraydah,Abha,Jubail,Hail
+United Arab Emirates:Abu Dhabi,Dubai,Sharjah,Al Ain,Ajman,Ras Al Khaimah,Fujairah
+Qatar:Doha,Al Rayyan,Al Wakrah,Umm Salal
+Kuwait:Kuwait City,Hawalli,Salmiya,Al Ahmadi,Jahra
+Oman:Muscat,Salalah,Sohar,Nizwa,Sur
+Jordan:Amman,Zarqa,Irbid,Aqaba,Madaba,Salt
+Lebanon:Beirut,Tripoli,Sidon,Tyre,Zahle,Baalbek
+Syria:Damascus,Aleppo,Homs,Latakia,Hama,Raqqa,Deir ez-Zor,Tartus
+Egypt:Cairo,Alexandria,Giza,Shubra El Kheima,Port Said,Suez,Luxor,Aswan,Mansoura,Tanta,Asyut,Ismailia,Faiyum,Zagazig,Damietta,Hurghada,Sharm El Sheikh
+Pakistan:Karachi,Lahore,Faisalabad,Rawalpindi,Gujranwala,Peshawar,Multan,Islamabad,Quetta,Sialkot,Bahawalpur,Sargodha,Sukkur,Larkana,Abbottabad,Mardan
+India:Mumbai,Delhi,Bangalore,Ahmedabad,Chennai,Kolkata,Surat,Pune,Jaipur,Lucknow,Kanpur,Nagpur,Indore,Bhopal,Visakhapatnam,Patna,Vadodara,Ghaziabad,Ludhiana,Agra,Nashik,Faridabad,Meerut,Rajkot,Varanasi,Srinagar,Aurangabad,Amritsar,Allahabad,Ranchi,Coimbatore,Jabalpur,Gwalior,Vijayawada,Jodhpur,Madurai,Raipur,Kota,Guwahati,Chandigarh,Thiruvananthapuram,Mysore,Bhubaneswar,Kochi,Dehradun,Jamshedpur,Dhanbad,Mangalore,Jalandhar,Shimla
+Bangladesh:Dhaka,Chittagong,Khulna,Rajshahi,Sylhet,Barisal,Rangpur,Comilla,Narayanganj,Gazipur,Mymensingh
+China:Beijing,Shanghai,Guangzhou,Shenzhen,Chongqing,Tianjin,Chengdu,Wuhan,Hangzhou,Nanjing,Xi'an,Shenyang,Harbin,Zhengzhou,Qingdao,Dalian,Jinan,Changsha,Kunming,Fuzhou,Xiamen,Hefei,Nanchang,Taiyuan,Shijiazhuang,Changchun,Urumqi,Lanzhou,Guiyang,Nanning,Hohhot,Yinchuan,Xining,Lhasa,Haikou,Suzhou,Wuxi,Ningbo,Dongguan,Foshan,Zhuhai,Wenzhou,Shantou,Luoyang,Tangshan,Baotou,Datong,Anshan,Fushun,Jilin,Qiqihar,Yantai,Weifang,Zibo,Linyi,Xuzhou,Changzhou,Nantong,Yangzhou,Jiaxing,Huzhou,Shaoxing,Jinhua,Taizhou,Zhongshan,Huizhou,Jiangmen,Zhanjiang,Liuzhou,Guilin,Baoding,Handan,Kaifeng,Yichang,Xiangyang
+Japan:Tokyo,Yokohama,Osaka,Nagoya,Sapporo,Fukuoka,Kobe,Kyoto,Kawasaki,Saitama,Hiroshima,Sendai,Kitakyushu,Chiba,Niigata,Hamamatsu,Kumamoto,Sagamihara,Okayama,Shizuoka,Kagoshima,Naha,Nara,Kanazawa,Matsuyama,Nagasaki,Utsunomiya,Toyama,Gifu,Himeji
+South Korea:Seoul,Busan,Incheon,Daegu,Daejeon,Gwangju,Suwon,Ulsan,Changwon,Goyang,Yongin,Seongnam,Cheongju,Jeonju,Jeju,Pohang
+Thailand:Bangkok,Chiang Mai,Phuket,Pattaya,Nakhon Ratchasima,Hat Yai,Udon Thani,Khon Kaen,Chiang Rai,Nonthaburi,Surat Thani,Ayutthaya
+Vietnam:Hanoi,Ho Chi Minh City,Da Nang,Hai Phong,Can Tho,Hue,Nha Trang,Vinh,Da Lat,Bien Hoa,Vung Tau
+Indonesia:Jakarta,Surabaya,Bandung,Medan,Semarang,Makassar,Palembang,Tangerang,Depok,Batam,Pekanbaru,Bogor,Bandar Lampung,Padang,Malang,Denpasar,Balikpapan,Yogyakarta,Manado,Pontianak,Banjarmasin,Samarinda
+Malaysia:Kuala Lumpur,George Town,Johor Bahru,Ipoh,Shah Alam,Kota Kinabalu,Kuching,Malacca,Petaling Jaya,Klang,Kuantan,Putrajaya
+Kazakhstan:Astana,Almaty,Shymkent,Karaganda,Aktobe,Taraz,Pavlodar,Semey,Atyrau,Kostanay
+Uzbekistan:Tashkent,Samarkand,Namangan,Andijan,Bukhara,Nukus,Fergana,Khiva
+Turkmenistan:Ashgabat,Turkmenabat,Dashoguz,Mary,Turkmenbashi
+Tajikistan:Dushanbe,Khujand,Kulob,Bokhtar,Istaravshan
+Russia:Moscow,Saint Petersburg,Novosibirsk,Yekaterinburg,Kazan,Nizhny Novgorod,Chelyabinsk,Samara,Omsk,Rostov-on-Don,Ufa,Krasnoyarsk,Voronezh,Perm,Volgograd,Krasnodar,Saratov,Tyumen,Tolyatti,Izhevsk,Barnaul,Irkutsk,Khabarovsk,Vladivostok,Makhachkala,Murmansk,Arkhangelsk,Kaliningrad,Sochi,Yaroslavl,Tomsk,Kemerovo,Orenburg,Ryazan,Tula,Kirov,Grozny,Yakutsk
+Ukraine:Kyiv,Kharkiv,Odesa,Dnipro,Donetsk,Zaporizhzhia,Lviv,Kryvyi Rih,Mykolaiv,Mariupol,Luhansk,Vinnytsia,Poltava,Chernihiv,Cherkasy,Sumy,Zhytomyr,Ivano-Frankivsk,Uzhhorod
+Poland:Warsaw,Krakow,Lodz,Wroclaw,Poznan,Gdansk,Szczecin,Bydgoszcz,Lublin,Katowice,Bialystok,Gdynia,Czestochowa,Rzeszow,Torun,Kielce
+Germany:Berlin,Hamburg,Munich,Cologne,Frankfurt,Stuttgart,Dusseldorf,Leipzig,Dortmund,Essen,Bremen,Dresden,Hanover,Nuremberg,Duisburg,Bochum,Wuppertal,Bielefeld,Bonn,Mannheim,Karlsruhe,Wiesbaden,Augsburg,Aachen,Kiel,Rostock,Freiburg,Heidelberg,Mainz,Erfurt
+France:Paris,Marseille,Lyon,Toulouse,Nice,Nantes,Strasbourg,Montpellier,Bordeaux,Lille,Rennes,Reims,Le Havre,Toulon,Grenoble,Dijon,Angers,Nimes,Brest,Limoges,Tours,Amiens,Perpignan,Metz,Rouen,Caen,Nancy,Avignon,Cannes,Orleans
+United Kingdom:London,Birmingham,Manchester,Glasgow,Liverpool,Leeds,Sheffield,Edinburgh,Bristol,Cardiff,Belfast,Leicester,Coventry,Nottingham,Newcastle,Southampton,Portsmouth,Brighton,Plymouth,Aberdeen,Swansea,Oxford,Cambridge,York,Bath,Norwich,Dundee,Derby,Bradford,Hull
+Spain:Madrid,Barcelona,Valencia,Seville,Zaragoza,Malaga,Murcia,Palma,Las Palmas,Bilbao,Alicante,Valladolid,Vigo,Gijon,Granada,A Coruna,Vitoria,Elche,Oviedo,Pamplona,Santander,San Sebastian,Toledo,Salamanca,Cadiz
+Portugal:Lisbon,Porto,Braga,Coimbra,Funchal,Faro,Aveiro,Setubal,Evora,Guimaraes
+Italy:Rome,Milan,Naples,Turin,Palermo,Genoa,Bologna,Florence,Bari,Catania,Venice,Verona,Messina,Padua,Trieste,Parma,Brescia,Taranto,Cagliari,Perugia,Pisa,Bergamo,Siena
+Greece:Athens,Thessaloniki,Patras,Heraklion,Larissa,Volos,Ioannina,Chania,Rhodes,Corfu
+Netherlands:Amsterdam,Rotterdam,The Hague,Utrecht,Eindhoven,Groningen,Tilburg,Almere,Breda,Nijmegen,Maastricht,Leiden
+Belgium:Brussels,Antwerp,Ghent,Charleroi,Liege,Bruges,Namur,Leuven,Mons
+Switzerland:Bern,Zurich,Geneva,Basel,Lausanne,Lucerne,Lugano,St. Gallen,Winterthur
+Austria:Vienna,Graz,Linz,Salzburg,Innsbruck,Klagenfurt,Villach
+Sweden:Stockholm,Gothenburg,Malmo,Uppsala,Vasteras,Orebro,Linkoping,Helsingborg,Kiruna
+Norway:Oslo,Bergen,Trondheim,Stavanger,Tromso,Drammen,Kristiansand,Bodo
+Finland:Helsinki,Espoo,Tampere,Vantaa,Oulu,Turku,Jyvaskyla,Lahti,Rovaniemi
+Denmark:Copenhagen,Aarhus,Odense,Aalborg,Esbjerg,Roskilde
+Ireland:Dublin,Cork,Limerick,Galway,Waterford,Drogheda
+Hungary:Budapest,Debrecen,Szeged,Miskolc,Pecs,Gyor
+Czechia:Prague,Brno,Ostrava,Plzen,Liberec,Olomouc
+Romania:Bucharest,Cluj-Napoca,Timisoara,Iasi,Constanta,Brasov,Craiova,Galati,Sibiu
+United States:New York,Los Angeles,Chicago,Houston,Phoenix,Philadelphia,San Antonio,San Diego,Dallas,San Jose,Austin,Jacksonville,Fort Worth,Columbus,Charlotte,San Francisco,Indianapolis,Seattle,Denver,Boston,El Paso,Nashville,Detroit,Oklahoma City,Portland,Las Vegas,Memphis,Louisville,Baltimore,Milwaukee,Albuquerque,Tucson,Fresno,Sacramento,Kansas City,Atlanta,Miami,Omaha,Raleigh,Cleveland,Tampa,New Orleans,Minneapolis,Honolulu,Pittsburgh,Cincinnati,St. Louis,Orlando,Salt Lake City,Anchorage,Buffalo,Richmond
+Canada:Toronto,Montreal,Vancouver,Calgary,Edmonton,Ottawa,Winnipeg,Quebec City,Halifax,Victoria,Saskatoon,Regina,St. John's,Mississauga,Brampton,Kitchener,Windsor,Kelowna
+Mexico:Mexico City,Guadalajara,Monterrey,Puebla,Tijuana,Leon,Juarez,Zapopan,Merida,Cancun,Aguascalientes,Queretaro,Morelia,San Luis Potosi,Chihuahua,Toluca,Hermosillo,Saltillo,Veracruz,Acapulco,Culiacan,Oaxaca,Mazatlan,Tampico,Cuernavaca
+Brazil:Sao Paulo,Rio de Janeiro,Brasília,Salvador,Fortaleza,Belo Horizonte,Manaus,Curitiba,Recife,Porto Alegre,Belem,Goiania,Guarulhos,Campinas,Sao Luis,Maceio,Natal,Teresina,Campo Grande,Joao Pessoa,Florianopolis,Cuiaba,Aracaju,Santos,Londrina,Uberlandia,Ribeirao Preto,Sorocaba,Joinville,Porto Velho,Macapa,Boa Vista,Palmas
+Argentina:Buenos Aires,Rosario,Mendoza,San Miguel de Tucuman,La Plata,Mar del Plata,Salta,Santa Fe,San Juan,Neuquen,Ushuaia,Bariloche,Resistencia
+Chile:Santiago,Valparaiso,Concepcion,Antofagasta,Vina del Mar,Temuco,La Serena,Iquique,Rancagua,Punta Arenas,Puerto Montt,Arica
+Colombia:Bogotá,Medellin,Cali,Barranquilla,Cartagena,Cucuta,Bucaramanga,Pereira,Santa Marta,Ibague,Manizales,Pasto,Villavicencio
+Peru:Lima,Arequipa,Trujillo,Chiclayo,Cusco,Piura,Iquitos,Huancayo,Tacna,Pucallpa
+Cuba:Havana,Santiago de Cuba,Camaguey,Holguin,Santa Clara,Guantanamo,Cienfuegos,Varadero
+Australia:Sydney,Melbourne,Brisbane,Perth,Adelaide,Gold Coast,Canberra,Hobart,Darwin,Cairns,Townsville,Wollongong,Geelong
+New Zealand:Auckland,Wellington,Christchurch,Dunedin,Tauranga,Queenstown,Napier
+South Africa:Pretoria,Johannesburg,Cape Town,Durban,Port Elizabeth,Bloemfontein,East London,Soweto,Polokwane,Kimberley,Pietermaritzburg,Nelspruit
+Nigeria:Lagos,Kano,Ibadan,Abuja,Port Harcourt,Benin City,Maiduguri,Kaduna,Zaria,Aba,Jos,Enugu,Ilorin,Abeokuta,Owerri,Calabar
+Kenya:Nairobi,Mombasa,Kisumu,Nakuru,Eldoret,Thika,Malindi
+Ethiopia:Addis Ababa,Dire Dawa,Mekelle,Gondar,Bahir Dar,Hawassa,Jimma,Adama
+Morocco:Casablanca,Rabat,Fez,Marrakesh,Tangier,Agadir,Meknes,Oujda,Tetouan,Kenitra,Essaouira
+Algeria:Algiers,Oran,Constantine,Annaba,Blida,Batna,Setif,Tlemcen,Bejaia,Ghardaia`;
+D.forEach(d=>d.cities=[]);CITY_RAW.split("\n").forEach(l=>{const i=l.indexOf(":"),d=D.find(x=>x.c==l.slice(0,i));if(d)d.cities=l.slice(i+1).split(",")});
+const CFA={};`Urmia=ارومیه,Rasht=رشت,Zahedan=زاهدان,Kerman=کرمان,Arak=اراک,Yazd=یزد,Ardabil=اردبیل,Bandar Abbas=بندرعباس,Hamadan=همدان,Qazvin=قزوین,Sanandaj=سنندج,Zanjan=زنجان,Gorgan=گرگان,Sari=ساری,Bushehr=بوشهر,Birjand=بیرجند,Kunduz=قندوز,Ghazni=غزنی,Gaziantep=غازی‌عنتاب,Kayseri=قیصریه,Mersin=مرسین,Diyarbakir=دیاربکر,Samsun=سامسون,Trabzon=طرابزون,Erzurum=ارزروم,Van=وان,Sivas=سیواس,Nakhchivan=نخجوان,Sumqayit=سومقاییت,Shaki=شکی,Lankaran=لنکران,Gyumri=گیومری,Sulaymaniyah=سلیمانیه,Fallujah=فلوجه,Duhok=دهوک,Khobar=الخبر,Abha=ابها,Hail=حائل,Fujairah=فجیره,Al Rayyan=الریان,Nizwa=نزوی,Madaba=مادبا,Zahle=زحله,Deir ez-Zor=دیرالزور,Mansoura=منصوره,Tanta=طنطا,Asyut=اسیوط,Ismailia=اسماعیلیه,Damietta=دمیاط,Hurghada=غردقه,Sharm El Sheikh=شرم‌الشیخ,Gujranwala=گجرانوالا,Sialkot=سیالکوت,Abbottabad=ابیت‌آباد,Mardan=مردان,Lucknow=لکهنو,Kanpur=کانپور,Nagpur=ناگپور,Indore=ایندور,Bhopal=بوپال,Patna=پتنا,Agra=آگرا,Varanasi=وارانسی,Srinagar=سریناگار,Amritsar=امریتسر,Allahabad=الله‌آباد,Jodhpur=جودپور,Mysore=میسور,Kochi=کوچی,Shimla=شیملا,Chandigarh=چندیگر,Guwahati=گواهاتی,Rajshahi=راجشاهی,Rangpur=رنگپور,Mymensingh=میمن‌سینگ,Nanjing=نانجینگ,Xi'an=شی‌آن,Shenyang=شنیانگ,Harbin=هاربین,Zhengzhou=ژنگژو,Qingdao=چینگدائو,Dalian=دالیان,Kunming=کونمینگ,Xiamen=شیامن,Urumqi=ارومچی,Lhasa=لهاسا,Suzhou=سوژو,Ningbo=نینگبو,Dongguan=دونگگوان,Foshan=فوشان,Luoyang=لویانگ,Guilin=گویلین,Changsha=چانگشا,Jinan=جینان,Hefei=هفی,Fuzhou=فوژو,Nanning=نانینگ,Lanzhou=لانژو,Changchun=چانگچون,Wuxi=ووشی,Saitama=سایتاما,Hiroshima=هیروشیما,Sendai=سندای,Chiba=چیبا,Niigata=نیگاتا,Hamamatsu=هاماماتسو,Kumamoto=کوماموتو,Okayama=اوکایاما,Kagoshima=کاگوشیما,Naha=ناها,Nara=نارا,Kanazawa=کانازاوا,Nagasaki=ناگاساکی,Himeji=هیمجی,Suwon=سوون,Ulsan=اولسان,Jeju=ججو,Pohang=پوهانگ,Hat Yai=هات یای,Ayutthaya=آیوتایا,Hue=هوئه,Nha Trang=نها ترانگ,Da Lat=دالات,Semarang=سمارانگ,Makassar=ماکاسار,Palembang=پالمبانگ,Bogor=بوگور,Denpasar=دنپاسار,Yogyakarta=یوگیاکارتا,Malang=مالانگ,Ipoh=ایپوه,Kota Kinabalu=کوتا کینابالو,Kuching=کوچینگ,Malacca=مالاکا,Putrajaya=پوتراجایا,Karaganda=قره‌غندی,Aktobe=آقتوبه,Namangan=نمنگان,Andijan=اندیجان,Fergana=فرغانه,Turkmenabat=ترکمن‌آباد,Mary=مرو,Chelyabinsk=چلیابینسک,Omsk=اومسک,Ufa=اوفا,Krasnoyarsk=کراسنویارسک,Voronezh=ورونژ,Perm=پرم,Volgograd=ولگاگراد,Krasnodar=کراسنودار,Saratov=ساراتوف,Irkutsk=ایرکوتسک,Khabarovsk=خاباروفسک,Vladivostok=ولادیووستوک,Murmansk=مورمانسک,Kaliningrad=کالینینگراد,Sochi=سوچی,Yaroslavl=یاروسلاول,Tomsk=تومسک,Tula=تولا,Grozny=گروزنی,Yakutsk=یاکوتسک,Donetsk=دونتسک,Mariupol=ماریوپل,Luhansk=لوهانسک,Poltava=پولتاوا,Chernihiv=چرنیهیف,Sumy=سومی,Zhytomyr=ژیتومیر,Szczecin=شچچین,Lublin=لوبلین,Katowice=کاتوویتسه,Torun=تورون,Essen=اسن,Bremen=برمن,Dresden=درسدن,Hanover=هانوفر,Nuremberg=نورنبرگ,Duisburg=دویسبورگ,Bochum=بوخوم,Bielefeld=بیلفلد,Bonn=بن,Mannheim=مانهایم,Karlsruhe=کارلسروهه,Wiesbaden=ویسبادن,Augsburg=آگسبورگ,Aachen=آخن,Kiel=کیل,Rostock=روستوک,Freiburg=فرایبورگ,Heidelberg=هایدلبرگ,Mainz=ماینتس,Erfurt=ارفورت,Montpellier=مون‌پلیه,Lille=لیل,Rennes=رن,Reims=رنس,Le Havre=لو آور,Toulon=تولون,Grenoble=گرنوبل,Dijon=دیژون,Angers=آنژه,Brest=برست,Limoges=لیموژ,Tours=تور,Amiens=آمین,Perpignan=پرپینیان,Metz=متز,Rouen=روان,Caen=کاین,Nancy=نانسی,Avignon=آوینیون,Cannes=کن,Orleans=اورلئان,Sheffield=شفیلد,Cardiff=کاردیف,Belfast=بلفاست,Leicester=لستر,Coventry=کاونتری,Nottingham=ناتینگهام,Newcastle=نیوکاسل,Southampton=ساوت‌همپتون,Portsmouth=پورتسموث,Brighton=برایتون,Plymouth=پلیموث,Aberdeen=آبردین,Swansea=سوانزی,Oxford=آکسفورد,Cambridge=کمبریج,York=یورک,Bath=باث,Norwich=نوریچ,Dundee=دندی,Derby=دربی,Bradford=بردفورد,Hull=هال,Murcia=مورسیا,Palma=پالما,Las Palmas=لاس پالماس,Bilbao=بیلبائو,Alicante=آلیکانته,Valladolid=بایادولید,Vigo=ویگو,Granada=گرانادا,Pamplona=پامپلونا,Santander=سانتاندر,San Sebastian=سن سباستین,Toledo=تولدو,Salamanca=سالامانکا,Cadiz=کادیز,Braga=براگا,Coimbra=کوئیمبرا,Funchal=فونشال,Faro=فارو,Aveiro=آویرو,Catania=کاتانیا,Venice=ونیز,Verona=ورونا,Messina=مسینا,Padua=پادوا,Trieste=تریسته,Parma=پارما,Brescia=برشا,Taranto=تارانتو,Cagliari=کالیاری,Perugia=پروجا,Pisa=پیزا,Bergamo=برگامو,Larissa=لاریسا,Volos=ولوس,Rhodes=رودس,Corfu=کورفو,Groningen=خرونینگن,Breda=برادا,Maastricht=ماستریخت,Leiden=لیدن,Charleroi=شارلروا,Namur=نامور,Leuven=لوون,Mons=مون,Lugano=لوگانو,Winterthur=وینترتور,Klagenfurt=کلاگنفورت,Linkoping=لینشوپینگ,Helsingborg=هلسینگبورگ,Kiruna=کیرونا,Tromso=ترومسو,Kristiansand=کریستیانساند,Espoo=اسپو,Vantaa=وانتا,Oulu=اولو,Lahti=لاهتی,Rovaniemi=روواینیمی,Aalborg=آلبورگ,Esbjerg=اسبیرگ,Roskilde=روسکیلده,Limerick=لیمریک,Waterford=واترفورد,Szeged=سگد,Miskolc=میشکولتس,Pecs=پچ,Ostrava=اوستراوا,Plzen=پلزن,Liberec=لیبرتس,Olomouc=اولوموتس,Brasov=براشوف,Galati=گالاتی,Sibiu=سیبیو,San Jose=سن‌خوزه,Austin=آستین,Jacksonville=جکسونویل,Fort Worth=فورت ورث,Columbus=کلمبوس,Charlotte=شارلوت,San Francisco=سان‌فرانسیسکو,Indianapolis=ایندیاناپولیس,Seattle=سیاتل,Denver=دنور,Boston=بوستون,El Paso=ال پاسو,Nashville=نشویل,Detroit=دیترویت,Oklahoma City=اوکلاهما سیتی,Portland=پورتلند,Las Vegas=لاس‌وگاس,Memphis=ممفیس,Louisville=لوئیزویل,Baltimore=بالتیمور,Milwaukee=میلواکی,Albuquerque=آلبوکرکی,Tucson=توسان,Fresno=فرزنو,Sacramento=ساکرامنتو,Kansas City=کانزاس سیتی,Atlanta=آتلانتا,Miami=میامی,Omaha=اوماها,Raleigh=رالی,Cleveland=کلیولند,Tampa=تامپا,New Orleans=نیواورلئان,Minneapolis=مینیاپولیس,Honolulu=هونولولو,Pittsburgh=پیتسبورگ,Cincinnati=سینسیناتی,St. Louis=سنت لوئیس,Orlando=اورلاندو,Salt Lake City=سالت لیک سیتی,Anchorage=انکوریج,Buffalo=بوفالو,Richmond=ریچموند,Victoria=ویکتوریا,Saskatoon=ساسکاتون,Regina=رجاینا,Mississauga=می‌سیساگا,Brampton=برمپتون,Windsor=ویندزور,Kelowna=کلونا,Cancun=کانکون,Acapulco=آکاپولکو,Veracruz=وراکروز,Chihuahua=چی‌واوا,Morelia=مورلیا,Toluca=تولوکا,Mazatlan=مازاتلان,Porto Alegre=پورتو الگره,Belem=بلم,Campinas=کامپیناس,Natal=ناتال,Florianopolis=فلوریانوپولیس,Santos=سانتوس,Salta=سالتا,Santa Fe=سانتافه,Ushuaia=اوشوایا,Bariloche=باریلوچه,Antofagasta=آنتوفاگاستا,Vina del Mar=وینا دل مار,La Serena=لا سرنا,Punta Arenas=پونتا آرناس,Arica=آریکا,Santa Marta=سانتا مارتا,Iquitos=ایکیتوس,Camaguey=کاماگوی,Santa Clara=سانتا کلارا,Guantanamo=گوانتانامو,Varadero=وارادرو,Cairns=کرنز,Townsville=تاونزویل,Wollongong=ولونگونگ,Geelong=جیلانگ,Tauranga=تائورانگا,Queenstown=کوئینزتاون,Napier=نپیر,Port Elizabeth=پورت الیزابت,Bloemfontein=بلومفونتین,East London=ایست لندن,Kimberley=کیمبرلی,Pietermaritzburg=پیترماریتسبورگ,Port Harcourt=پورت هارکورت,Benin City=بنین سیتی,Kaduna=کادونا,Jos=جوس,Enugu=انوگو,Calabar=کالابار,Nakuru=ناکورو,Eldoret=الدورت,Malindi=مالیندی,Mekelle=مکله,Bahir Dar=بحر دار,Hawassa=هوآسا,Meknes=مکناس,Oujda=وجده,Tetouan=تطوان,Kenitra=قنیطره,Essaouira=صویره,Blida=بلیده,Batna=باتنه,Setif=سطیف,Tlemcen=تلمسان,Bejaia=بجایه,Ghardaia=غردایه,Tehran=تهران,Mashhad=مشهد,Isfahan=اصفهان,Karaj=کرج,Shiraz=شیراز,Tabriz=تبریز,Qom=قم,Ahvaz=اهواز,Kermanshah=کرمانشاه,Kabul=کابل,Kandahar=قندهار,Herat=هرات,Mazar-i-Sharif=مزار شریف,Jalalabad=جلال‌آباد,Istanbul=استانبول,Ankara=آنکارا,Izmir=ازمیر,Bursa=بورسا,Adana=آدانا,Konya=قونیه,Antalya=آنتالیا,Baku=باکو,Ganja=گنجه,Yerevan=ایروان,Tbilisi=تفلیس,Batumi=باتومی,Kutaisi=کوتایسی,Baghdad=بغداد,Basra=بصره,Mosul=موصل,Erbil=اربیل,Kirkuk=کرکوک,Najaf=نجف,Karbala=کربلا,Riyadh=ریاض,Jeddah=جده,Mecca=مکه,Medina=مدینه,Dammam=دمام,Taif=طائف,Tabuk=تبوک,Abu Dhabi=ابوظبی,Dubai=دبی,Sharjah=شارجه,Al Ain=العین,Ajman=عجمان,Doha=دوحه,Kuwait City=شهر کویت,Muscat=مسقط,Salalah=صلاله,Sohar=صحار,Amman=عمان,Zarqa=زرقا,Irbid=اربد,Aqaba=عقبه,Beirut=بیروت,Tripoli=طرابلس,Sidon=صیدا,Tyre=صور,Baalbek=بعلبک,Damascus=دمشق,Aleppo=حلب,Homs=حمص,Latakia=لاذقیه,Hama=حماه,Raqqa=رقه,Tartus=طرطوس,Cairo=قاهره,Alexandria=اسکندریه,Giza=جیزه,Port Said=پورت سعید,Suez=سوئز,Luxor=لوکسور,Aswan=اسوان,Karachi=کراچی,Lahore=لاهور,Faisalabad=فیصل‌آباد,Rawalpindi=راولپندی,Peshawar=پیشاور,Multan=مولتان,Islamabad=اسلام‌آباد,Quetta=کویته,Mumbai=بمبئی,Delhi=دهلی,Bangalore=بنگلور,Ahmedabad=احمدآباد,Chennai=چنای,Kolkata=کلکته,Surat=سورات,Pune=پونا,Jaipur=جیپور,Dhaka=داکا,Chittagong=چیتاگونگ,Khulna=خولنا,Sylhet=سیلهت,Beijing=پکن,Shanghai=شانگهای,Guangzhou=گوانگژو,Shenzhen=شنژن,Chongqing=چونگ‌چینگ,Tianjin=تیانجین,Chengdu=چنگدو,Wuhan=ووهان,Hangzhou=هانگژو,Tokyo=توکیو,Yokohama=یوکوهاما,Osaka=اوزاکا,Nagoya=ناگویا,Sapporo=ساپورو,Fukuoka=فوکوئوکا,Kobe=کوبه,Kyoto=کیوتو,Kawasaki=کاوازاکی,Seoul=سئول,Busan=بوسان,Incheon=اینچئون,Daegu=دائگو,Daejeon=دائجون,Gwangju=گوانگجو,Bangkok=بانکوک,Chiang Mai=چیانگ‌مای,Phuket=پوکت,Pattaya=پاتایا,Hanoi=هانوی,Ho Chi Minh City=هوشی‌مین,Da Nang=دانانگ,Hai Phong=هایفونگ,Jakarta=جاکارتا,Surabaya=سورابایا,Bandung=باندونگ,Medan=مدان,Kuala Lumpur=کوالالامپور,George Town=جورج‌تاون,Johor Bahru=جوهر بهرو,Astana=آستانه,Almaty=آلماتی,Shymkent=شیمکنت,Tashkent=تاشکند,Samarkand=سمرقند,Bukhara=بخارا,Khiva=خیوه,Ashgabat=عشق‌آباد,Dushanbe=دوشنبه,Khujand=خجند,Moscow=مسکو,Saint Petersburg=سن‌پترزبورگ,Novosibirsk=نووسیبیرسک,Yekaterinburg=یکاترینبورگ,Kazan=کازان,Nizhny Novgorod=نیژنی نووگورود,Samara=سامارا,Kyiv=کی‌یف,Kharkiv=خارکف,Odesa=اودسا,Dnipro=دنیپرو,Lviv=لویو,Warsaw=ورشو,Krakow=کراکوف,Lodz=وودچ,Wroclaw=وروتسواف,Poznan=پوزنان,Gdansk=گدانسک,Berlin=برلین,Hamburg=هامبورگ,Munich=مونیخ,Cologne=کلن,Frankfurt=فرانکفورت,Stuttgart=اشتوتگارت,Dusseldorf=دوسلدورف,Leipzig=لایپزیگ,Dortmund=دورتموند,Paris=پاریس,Marseille=مارسی,Lyon=لیون,Toulouse=تولوز,Nice=نیس,Nantes=نانت,Strasbourg=استراسبورگ,Bordeaux=بوردو,London=لندن,Birmingham=بیرمنگام,Manchester=منچستر,Glasgow=گلاسگو,Liverpool=لیورپول,Leeds=لیدز,Edinburgh=ادینبورگ,Bristol=بریستول,Madrid=مادرید,Barcelona=بارسلونا,Valencia=والنسیا,Seville=سویل,Zaragoza=ساراگوسا,Malaga=مالاگا,Lisbon=لیسبون,Porto=پورتو,Rome=رم,Milan=میلان,Naples=ناپل,Turin=تورین,Palermo=پالرمو,Genoa=جنوا,Bologna=بولونیا,Florence=فلورانس,Bari=باری,Athens=آتن,Thessaloniki=تسالونیکی,Patras=پاتراس,Heraklion=هراکلیون,Amsterdam=آمستردام,Rotterdam=روتردام,The Hague=لاهه,Utrecht=اوترخت,Eindhoven=آیندهوون,Brussels=بروکسل,Antwerp=آنتورپ,Ghent=خنت,Bruges=بروژ,Liege=لیژ,Bern=برن,Zurich=زوریخ,Geneva=ژنو,Basel=بازل,Lausanne=لوزان,Lucerne=لوسرن,Vienna=وین,Graz=گراتس,Linz=لینتس,Salzburg=زالتسبورگ,Innsbruck=اینسبروک,Stockholm=استکهلم,Gothenburg=گوتنبرگ,Malmo=مالمو,Uppsala=اوپسالا,Oslo=اسلو,Bergen=برگن,Trondheim=ترونهایم,Stavanger=استاوانگر,Helsinki=هلسینکی,Tampere=تامپره,Turku=تورکو,Copenhagen=کپنهاگ,Aarhus=آرهوس,Odense=اودنسه,Dublin=دوبلین,Cork=کورک,Galway=گالوی,Budapest=بوداپست,Debrecen=دبرسن,Prague=پراگ,Brno=برنو,Bucharest=بخارست,Cluj-Napoca=کلوژ-ناپوکا,Timisoara=تیمیشوارا,Iasi=یاش,Constanta=کنستانتا,New York=نیویورک,Los Angeles=لس‌آنجلس,Chicago=شیکاگو,Houston=هیوستون,Phoenix=فینیکس,Philadelphia=فیلادلفیا,San Antonio=سن‌آنتونیو,San Diego=سن‌دیگو,Dallas=دالاس,Toronto=تورنتو,Montreal=مونترال,Vancouver=ونکوور,Calgary=کلگری,Edmonton=ادمونتون,Ottawa=اتاوا,Winnipeg=وینیپگ,Quebec City=کبک,Halifax=هالیفکس,Mexico City=مکزیکوسیتی,Guadalajara=گوادالاخارا,Monterrey=مونتری,Puebla=پوئبلا,Tijuana=تیخوانا,Leon=لئون,Merida=مریدا,Sao Paulo=سائوپائولو,Rio de Janeiro=ریودوژانیرو,Brasília=برازیلیا,Salvador=سالوادور,Fortaleza=فورتالزا,Belo Horizonte=بلو اوریزونته,Manaus=مانائوس,Curitiba=کوریتیبا,Recife=ریسیفی,Buenos Aires=بوئنوس آیرس,Rosario=روساریو,Mendoza=مندوسا,La Plata=لاپلاتا,Santiago=سانتیاگو,Valparaiso=والپارایسو,Concepcion=کونسپسیون,Bogotá=بوگوتا,Medellin=مدلین,Cali=کالی,Barranquilla=بارانکیا,Cartagena=کارتاخنا,Lima=لیما,Arequipa=آرکیپا,Trujillo=تروخیو,Cusco=کوسکو,Havana=هاوانا,Santiago de Cuba=سانتیاگو د کوبا,Sydney=سیدنی,Melbourne=ملبورن,Brisbane=بریزبین,Perth=پرت,Adelaide=آدلاید,Gold Coast=گلد کوست,Canberra=کانبرا,Hobart=هوبارت,Darwin=داروین,Auckland=اوکلند,Wellington=ولینگتون,Christchurch=کرایست‌چرچ,Dunedin=داندین,Pretoria=پرتوریا,Johannesburg=ژوهانسبورگ,Cape Town=کیپ‌تاون,Durban=دوربان,Soweto=سووتو,Lagos=لاگوس,Kano=کانو,Ibadan=ایبادان,Abuja=ابوجا,Nairobi=نایروبی,Mombasa=مومباسا,Kisumu=کیسومو,Addis Ababa=آدیس‌آبابا,Dire Dawa=دیره‌داوا,Gondar=گوندر,Casablanca=کازابلانکا,Rabat=رباط,Fez=فاس,Marrakesh=مراکش,Tangier=طنجه,Agadir=آگادیر,Algiers=الجزیره,Oran=وهران,Constantine=قسنطینه,Annaba=عنابه`.split(",").forEach(p=>{const i=p.indexOf("=");CFA[p.slice(0,i)]=p.slice(i+1)});
+const HIST={};`Iran|550 BC|Cyrus the Great founds the Achaemenid Empire.|کوروش بزرگ شاهنشاهی هخامنشی را بنیان می‌گذارد.
+Iran|330 BC|Alexander the Great conquers the Persian Empire.|اسکندر مقدونی شاهنشاهی هخامنشی را فتح می‌کند.
+Iran|224|Ardashir I founds the Sasanian Empire.|اردشیر یکم شاهنشاهی ساسانی را بنیان می‌گذارد.
+Iran|651|The Arab conquest ends the Sasanian Empire.|فتح عرب‌ها به شاهنشاهی ساسانی پایان می‌دهد.
+Iran|1501|Shah Ismail I founds the Safavid dynasty.|شاه اسماعیل یکم سلسله صفوی را تأسیس می‌کند.
+Iran|1736|Nader Shah is crowned and founds the Afsharid dynasty.|نادرشاه تاج‌گذاری می‌کند و سلسله افشاریه را بنیان می‌گذارد.
+Iran|1906|The Constitutional Revolution creates Iran's first parliament.|انقلاب مشروطه نخستین مجلس ایران را پدید می‌آورد.
+Iran|1925|Reza Shah founds the Pahlavi dynasty.|رضاشاه سلسله پهلوی را تأسیس می‌کند.
+Iran|1979|The Islamic Revolution ends the monarchy.|انقلاب اسلامی به نظام پادشاهی پایان می‌دهد.
+Iran|1980|The Iran-Iraq War begins and lasts eight years.|جنگ ایران و عراق آغاز می‌شود و هشت سال ادامه می‌یابد.
+Azerbaijan|1813|The Treaty of Gulistan gives Russia much of present-day Azerbaijan.|عهدنامه گلستان بخش بزرگی از آذربایجان امروزی را به روسیه می‌دهد.
+Azerbaijan|1828|The Treaty of Turkmenchay confirms Russian rule north of the Aras River.|عهدنامه ترکمانچای حاکمیت روسیه در شمال رود ارس را تثبیت می‌کند.
+Azerbaijan|1846|The first industrial oil well is drilled near Baku.|نخستین چاه نفت صنعتی نزدیک باکو حفر می‌شود.
+Azerbaijan|1918|The Azerbaijan Democratic Republic is proclaimed.|جمهوری دموکراتیک آذربایجان اعلام می‌شود.
+Azerbaijan|1920|The Red Army enters Baku and Soviet rule begins.|ارتش سرخ وارد باکو می‌شود و حکومت شوروی آغاز می‌شود.
+Azerbaijan|1988|The Karabakh conflict begins.|درگیری قره‌باغ آغاز می‌شود.
+Azerbaijan|1991|Azerbaijan restores its independence from the USSR.|آذربایجان استقلال خود را از اتحاد شوروی بازمی‌یابد.
+Azerbaijan|1994|The Contract of the Century oil deal is signed.|قرارداد نفتی «قرارداد قرن» امضا می‌شود.
+Azerbaijan|2005|The Baku-Tbilisi-Ceyhan oil pipeline opens.|خط لوله نفت باکو–تفلیس–جیحان افتتاح می‌شود.
+Azerbaijan|2020|The Second Karabakh War ends with a ceasefire.|جنگ دوم قره‌باغ با آتش‌بس پایان می‌یابد.
+Turkey|1071|The Seljuks win the Battle of Manzikert.|سلجوقیان در نبرد ملازگرد پیروز می‌شوند.
+Turkey|1299|Osman I founds the Ottoman state.|عثمان یکم دولت عثمانی را بنیان می‌گذارد.
+Turkey|1453|Mehmed II conquers Constantinople.|سلطان محمد دوم قسطنطنیه را فتح می‌کند.
+Turkey|1520|Suleiman the Magnificent becomes sultan.|سلیمان قانونی سلطان می‌شود.
+Turkey|1683|The Ottomans fail to take Vienna.|عثمانی‌ها در تصرف وین ناکام می‌مانند.
+Turkey|1914|The Ottoman Empire enters World War I.|امپراتوری عثمانی وارد جنگ جهانی اول می‌شود.
+Turkey|1919|Atatürk starts the War of Independence.|آتاتورک جنگ استقلال را آغاز می‌کند.
+Turkey|1923|The Republic of Turkey is proclaimed.|جمهوری ترکیه اعلام می‌شود.
+Turkey|1952|Turkey joins NATO.|ترکیه به ناتو می‌پیوندد.
+Turkey|1999|Turkey becomes a candidate for EU membership.|ترکیه نامزد عضویت در اتحادیه اروپا می‌شود.
+Russia|862|Rurik is said to found the first Russian dynasty.|گفته می‌شود روریک نخستین سلسله روس را بنیان می‌گذارد.
+Russia|988|Prince Vladimir of Kyiv adopts Christianity.|شاهزاده ولادیمیر کی‌یف مسیحیت را می‌پذیرد.
+Russia|1480|Moscow ends Mongol rule.|مسکو به سلطه مغولان پایان می‌دهد.
+Russia|1703|Peter the Great founds Saint Petersburg.|پطر کبیر شهر سن‌پترزبورگ را بنیان می‌گذارد.
+Russia|1812|Napoleon's invasion of Russia fails.|حمله ناپلئون به روسیه شکست می‌خورد.
+Russia|1861|Tsar Alexander II abolishes serfdom.|تزار الکساندر دوم نظام سرواژ را لغو می‌کند.
+Russia|1917|The Revolution brings the Bolsheviks to power.|انقلاب بلشویک‌ها را به قدرت می‌رساند.
+Russia|1945|The Soviet Union helps defeat Nazi Germany.|اتحاد شوروی در شکست آلمان نازی نقش اصلی دارد.
+Russia|1961|Yuri Gagarin becomes the first human in space.|یوری گاگارین نخستین انسان در فضا می‌شود.
+Russia|1991|The Soviet Union dissolves.|اتحاد شوروی فرو می‌پاشد.
+Egypt|3100 BC|Egypt is unified under the first pharaoh.|مصر زیر فرمان نخستین فرعون یکپارچه می‌شود.
+Egypt|2560 BC|The Great Pyramid of Giza is completed.|هرم بزرگ جیزه ساخته می‌شود.
+Egypt|1274 BC|Ramesses II fights the Battle of Kadesh.|رامسس دوم در نبرد قادش می‌جنگد.
+Egypt|332 BC|Alexander the Great takes Egypt and founds Alexandria.|اسکندر مصر را می‌گیرد و اسکندریه را بنیان می‌گذارد.
+Egypt|30 BC|Cleopatra dies and Egypt becomes a Roman province.|کلئوپاترا می‌میرد و مصر ایالتی رومی می‌شود.
+Egypt|641|Arab forces conquer Egypt.|سپاه عرب مصر را فتح می‌کند.
+Egypt|969|The Fatimids found Cairo.|فاطمیان قاهره را بنیان می‌گذارند.
+Egypt|1869|The Suez Canal opens.|کانال سوئز افتتاح می‌شود.
+Egypt|1952|The Free Officers overthrow the monarchy.|افسران آزاد پادشاهی را برمی‌اندازند.
+Egypt|1979|Egypt and Israel sign a peace treaty.|مصر و اسرائیل پیمان صلح امضا می‌کنند.
+Germany|9|Germanic tribes defeat Rome in the Teutoburg Forest.|قبایل ژرمن رومیان را در جنگل توتبورگ شکست می‌دهند.
+Germany|800|Charlemagne is crowned emperor in Rome.|شارلمانی در رم به امپراتوری تاج‌گذاری می‌کند.
+Germany|962|Otto I is crowned emperor of the Holy Roman Empire.|اتو یکم امپراتور امپراتوری مقدس روم می‌شود.
+Germany|1517|Martin Luther starts the Reformation.|مارتین لوتر نهضت اصلاح دینی را آغاز می‌کند.
+Germany|1648|The Peace of Westphalia ends the Thirty Years' War.|صلح وستفالی به جنگ سی‌ساله پایان می‌دهد.
+Germany|1871|Bismarck unifies Germany under Prussian leadership.|بیسمارک آلمان را به رهبری پروس متحد می‌کند.
+Germany|1918|Germany loses World War I and the monarchy falls.|آلمان در جنگ جهانی اول شکست می‌خورد و پادشاهی سقوط می‌کند.
+Germany|1933|Hitler comes to power.|هیتلر به قدرت می‌رسد.
+Germany|1949|Germany is divided into West and East.|آلمان به غربی و شرقی تقسیم می‌شود.
+Germany|1990|Germany is reunified.|آلمان دوباره متحد می‌شود.
+France|52 BC|Julius Caesar defeats Vercingetorix and conquers Gaul.|ژولیوس سزار ورسینگتوریکس را شکست می‌دهد و گل را فتح می‌کند.
+France|987|Hugh Capet founds the Capetian dynasty.|هوگو کاپه سلسله کاپتی را بنیان می‌گذارد.
+France|1337|The Hundred Years' War begins.|جنگ صدساله آغاز می‌شود.
+France|1431|Joan of Arc is executed.|ژاندارک اعدام می‌شود.
+France|1643|Louis XIV becomes king.|لویی چهاردهم پادشاه می‌شود.
+France|1789|The French Revolution begins.|انقلاب فرانسه آغاز می‌شود.
+France|1804|Napoleon crowns himself emperor.|ناپلئون خود را امپراتور تاج‌گذاری می‌کند.
+France|1870|The Third Republic is proclaimed.|جمهوری سوم اعلام می‌شود.
+France|1944|Paris is liberated.|پاریس آزاد می‌شود.
+France|1958|De Gaulle founds the Fifth Republic.|دوگل جمهوری پنجم را بنیان می‌گذارد.
+United States|1607|Jamestown becomes the first permanent English colony.|جیمزتاون نخستین مستعمره دائمی انگلیسی می‌شود.
+United States|1776|The Declaration of Independence is adopted.|اعلامیه استقلال تصویب می‌شود.
+United States|1787|The Constitution is written.|قانون اساسی نوشته می‌شود.
+United States|1803|The Louisiana Purchase doubles the country's size.|خرید لوئیزیانا مساحت کشور را دو برابر می‌کند.
+United States|1861|The Civil War begins.|جنگ داخلی آغاز می‌شود.
+United States|1865|The 13th Amendment abolishes slavery.|اصلاحیه سیزدهم برده‌داری را لغو می‌کند.
+United States|1929|The Great Depression begins.|رکود بزرگ آغاز می‌شود.
+United States|1941|The US enters World War II after Pearl Harbor.|آمریکا پس از پرل هاربر وارد جنگ جهانی دوم می‌شود.
+United States|1969|Apollo 11 lands humans on the Moon.|آپولو ۱۱ انسان را بر ماه فرود می‌آورد.
+United States|2001|The September 11 attacks take place.|حملات ۱۱ سپتامبر رخ می‌دهد.
+Japan|710|Nara becomes Japan's capital.|ناره پایتخت ژاپن می‌شود.
+Japan|794|The capital moves to Heian-kyo, now Kyoto.|پایتخت به هیان‌کیو، کیوتوی امروز، منتقل می‌شود.
+Japan|1185|The Kamakura shogunate begins samurai rule.|شوگونی کاماکورا حکومت سامورایی‌ها را آغاز می‌کند.
+Japan|1543|Portuguese traders reach Japan.|بازرگانان پرتغالی به ژاپن می‌رسند.
+Japan|1603|Tokugawa Ieyasu founds the Edo shogunate.|توکوگاوا ایه‌یاسو شوگونی ادو را بنیان می‌گذارد.
+Japan|1853|Commodore Perry's ships end Japan's isolation.|کشتی‌های پری به انزوای ژاپن پایان می‌دهند.
+Japan|1868|The Meiji Restoration modernizes Japan.|اصلاحات میجی ژاپن را نوسازی می‌کند.
+Japan|1945|Japan surrenders in World War II.|ژاپن در جنگ جهانی دوم تسلیم می‌شود.
+Japan|1964|Tokyo hosts the Olympics and the first Shinkansen opens.|توکیو میزبان المپیک است و نخستین شینکانسن افتتاح می‌شود.
+Japan|2011|The Tohoku earthquake and tsunami strike.|زلزله و سونامی توهوکو رخ می‌دهد.`.split("\n").forEach(l=>{const[c,y,e,f]=l.split("|");(HIST[c]=HIST[c]||[]).push({y,e,f})});
+const hist=d=>HIST[d.c]?`<details class="hs"><summary>History: ${HIST[d.c].length} key events</summary>${HIST[d.c].map(h=>`<div class="he"><b>${h.y}</b> ${h.e} ${spk(h.y+". "+h.e)}<div class="hfa" dir="rtl">${h.f}</div></div>`).join("")}</details>`:`<div class="hs soon">📜 History: events coming soon</div>`;
+const cn=c=>CFA[c]?`${c} (<bdi dir="rtl">${CFA[c]}</bdi>)`:c;
+const THEMES=`white|Pure White|l|#ffffff|#ffffff|#000000|#5f6368|#0a58ca|#d9d9d9
+paper|Paper|l|#f6f4ef|#ffffff|#1d2433|#6b7280|#0f766e|#e3dfd6
+mint|Mint|l|#eaf6f0|#ffffff|#10261c|#5b7468|#0f7a55|#cfe5da
+sky|Sky|l|#eaf3fc|#ffffff|#0f2338|#5a7087|#1d6fd1|#cfe0f2
+lavender|Lavender|l|#f1eefa|#ffffff|#241a3d|#6f6690|#6d4bc4|#dcd5f0
+rose|Rose|l|#fcedf0|#ffffff|#3b1520|#8a6068|#c2415f|#f1d3da
+sand|Sand|l|#faf1e0|#fffdf8|#3a2a10|#86764f|#b4690e|#ecdcb9
+sage|Sage|l|#eef2e6|#fbfcf8|#1f2a12|#657253|#4d7c0f|#d7e0c6
+peach|Peach|l|#fdeee4|#ffffff|#3d1f10|#8d6a58|#d9541e|#f3d6c3
+slate|Slate|l|#eceff3|#ffffff|#1e293b|#64748b|#334155|#d4d9e1
+black|Pure Black|d|#000000|#0b0b0b|#ffffff|#a0a0a0|#4ade80|#262626
+midnight|Midnight|d|#12161d|#1b212b|#e8ebf0|#9aa3b2|#5eead4|#2a3240
+ocean|Ocean|d|#0a1621|#112334|#e3f0fb|#8fa9bf|#38bdf8|#1e3850
+forest|Forest|d|#0d1912|#15271c|#e3f3e8|#8aab97|#4ade80|#213b2b
+plum|Plum|d|#170f20|#221731|#f0e6fb|#a592bd|#c084fc|#36264c
+wine|Wine|d|#1d1013|#2b181c|#fbe7ea|#bf9399|#fb7185|#45252b
+coffee|Coffee|d|#19130e|#251c15|#f5ebe0|#b09a84|#f59e0b|#3c2e22
+graphite|Graphite|d|#1a1a1c|#242427|#ececee|#9a9aa0|#93c5fd|#36363a
+teal|Teal Night|d|#0a1c1c|#112a2a|#defaf6|#86b3ae|#2dd4bf|#1c4343
+ember|Ember|d|#1b120d|#281a12|#fbeadd|#b89b86|#fb923c|#43291a`.split("\n").map(l=>{const[id,name,m,bg,card,ink,mute,acc,line]=l.split("|");return{id,name,m,bg,card,ink,mute,acc,line}});
+let TH={id:"auto",t:0};try{const x=JSON.parse(localStorage.getItem("wc_theme")||"null");if(x&&x.id)TH={id:x.id,t:+x.t||0,cu:x.cu||{}}}catch(e){}
+const saveTheme=()=>{try{localStorage.setItem("wc_theme",JSON.stringify(TH))}catch(e){}};
+function applyTheme(id){
+ const r=document.documentElement,t=THEMES.find(x=>x.id==id);
+ ["--bg","--card","--ink","--mute","--acc","--accbg","--ok","--okbg","--bad","--badbg","--line","--onacc"].forEach(k=>r.style.removeProperty(k));
+ r.style.colorScheme="";r.dataset.mode=matchMedia("(prefers-color-scheme: dark)").matches?"d":"l";if(!t)return;
+ const dk=t.m=="d",h=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)),
+  mix=(a,b,p)=>"#"+h(a).map((v,i)=>Math.round(v*p+h(b)[i]*(1-p)).toString(16).padStart(2,"0")).join(""),
+  lum=c=>{const [R,G,B]=h(c).map(x=>{x/=255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)});return .2126*R+.7152*G+.0722*B};
+ const v={"--bg":t.bg,"--card":t.card,"--ink":t.ink,"--mute":t.mute,"--acc":t.acc,"--line":t.line,"--accbg":mix(t.acc,t.card,dk?.22:.14),
+  "--ok":dk?"#6ee79a":"#15803d","--okbg":dk?"#14301f":"#dcf5e3","--bad":dk?"#fca5a5":"#b91c1c","--badbg":dk?"#3a1a1a":"#fbe0e0"};
+ const cu=(TH.cu||{})[id]||{};if(cu.acc){v["--acc"]=cu.acc;v["--accbg"]=mix(cu.acc,t.card,dk?.22:.14)}if(cu.sec)v["--accbg"]=cu.sec;if(cu.ink){v["--ink"]=cu.ink;v["--mute"]=mix(cu.ink,t.bg,.62)}
+ v["--onacc"]=lum(v["--acc"])>.179?"#000000":"#ffffff";window.__cur={acc:v["--acc"],sec:v["--accbg"],ink:v["--ink"]};
+ Object.entries(v).forEach(([k,x])=>r.style.setProperty(k,x));r.style.colorScheme=dk?"dark":"light";r.dataset.mode=dk?"d":"l"}
+applyTheme(TH.id);
+function mergeTheme(t){if(t&&t.id&&(+t.t||0)>TH.t){TH={id:t.id,t:+t.t,cu:t.cu||{}};saveTheme();applyTheme(TH.id);return true}return false}
+const CUST=["white","black","slate","graphite"];
+const PAL={l:{a:["#2563eb","#0891b2","#16a34a","#ca8a04","#ea580c","#dc2626","#db2777","#9333ea","#4f46e5","#0f766e"],b:["#dbeafe","#cffafe","#dcfce7","#fef9c3","#ffedd5","#fee2e2","#fce7f3","#f3e8ff","#e0e7ff","#ccfbf1"]},
+ d:{a:["#60a5fa","#22d3ee","#4ade80","#facc15","#fb923c","#f87171","#f472b6","#c084fc","#818cf8","#2dd4bf"],b:["#1e3a5f","#0e3a44","#14381f","#443a0e","#4a2a10","#4a1c1c","#4a1c36","#35204f","#26275a","#0f3d38"]}};
+const INK={l:["#000000","#111827","#1f2937","#0f172a","#3b0764","#052e16","#431407","#4a044e","#1c1917","#7f1d1d"],d:["#ffffff","#f3f4f6","#e5e7eb","#fef3c7","#dcfce7","#dbeafe","#fce7f3","#ede9fe","#ffedd5","#ccfbf1"]};
+const CU3=[["cacc","acc"],["csec","sec"],["cink","ink"]];
+function refreshCu(){const c=window.__cur;if(!c||!$("cu"))return;
+ document.querySelectorAll("#cu .sw").forEach(b=>b.classList.toggle("on",b.dataset.v.toLowerCase()==String(c[b.dataset.cu]).toLowerCase()));
+ CU3.forEach(([id,k])=>{const e=$(id);if(e&&document.activeElement!==e)e.value=c[k]})}
+function setCu(k,v,final){TH.cu=TH.cu||{};TH.cu[TH.id]=Object.assign({},TH.cu[TH.id],{[k]:v});TH.t=Date.now();saveTheme();applyTheme(TH.id);refreshCu();if(final)autoSync()}
+function renderCu(){
+ const w=$("cuw");if(!w)return;
+ const t=THEMES.find(x=>x.id==TH.id);if(!t){w.innerHTML="";return}
+ const P=PAL[t.m],c=window.__cur||{acc:t.acc,sec:t.card,ink:t.ink},full=CUST.includes(t.id);
+ const sw=(arr,k)=>arr.map(x=>`<button class="sw" data-cu="${k}" data-v="${x}" style="background:${x}" aria-label="${x}"></button>`).join("");
+ const sec=(label,arr,k,id)=>`<p class="sub">${label}</p><div class="swr">${sw(arr,k)}<input type="color" id="${id}" value="${c[k]}" aria-label="${label}"></div>`;
+ w.innerHTML=`<div id="cu"><h3>Customize colors: ${t.name}</h3>${full?sec("Button &amp; accent color (buttons, tabs, links)",P.a,"acc","cacc")+sec("Secondary color (speaker buttons, counters, highlights)",P.b,"sec","csec"):""}${sec("Text color",INK[t.m],"ink","cink")}<button class="btn" id="cres">Reset colors</button></div>`;
+ w.querySelectorAll(".sw").forEach(b=>b.onclick=()=>setCu(b.dataset.cu,b.dataset.v,true));
+ CU3.forEach(([id,k])=>{const e=$(id);if(e){e.oninput=ev=>setCu(k,ev.target.value,false);e.onchange=()=>autoSync()}});
+ $("cres").onclick=()=>{if(TH.cu)delete TH.cu[TH.id];TH.t=Date.now();saveTheme();applyTheme(TH.id);renderCu();autoSync()};
+ refreshCu()}
+const DSL=[["classic","Classic","Default look"],["glass","Glass","Frosted, translucent"],["material","Material","Elevation & shadows"],["flat","Flat","No depth, sharp"],["duo","Playful","Chunky 3D, Duolingo-style"],["neu","Soft","Neumorphism"],["brutal","Brutal","Hard borders, offset shadows"],["mono","Terminal","Monospace, dashed lines"],["outline","Outline","Hollow cards, accent lines"],["aurora","Aurora","Soft gradient glow"],["bubble","Bubble","Very round, candy-like"]];
+let DS={id:"classic",t:0};try{const x=JSON.parse(localStorage.getItem("wc_design")||"null");if(x&&x.id)DS={id:x.id,t:+x.t||0}}catch(e){}
+const saveDS=()=>{try{localStorage.setItem("wc_design",JSON.stringify(DS))}catch(e){}};
+const applyDS=id=>{const r=document.documentElement;id&&id!="classic"?r.setAttribute("data-ds",id):r.removeAttribute("data-ds")};applyDS(DS.id);
+function mergeDesign(d){if(d&&d.id&&(+d.t||0)>DS.t){DS={id:d.id,t:+d.t};saveDS();applyDS(DS.id);return true}return false}
+const LOL=[["comfy","Comfortable","Default spacing"],["compact","Compact","Dense, more on screen"],["large","Large","Big text and buttons"],["bottom","Bottom bar","Menu at the bottom"],["side","Sidebar","Menu at the side (wide screens)"],["grid","Grid","Learn cards in columns (wide screens)"],["minimal","Minimal","Hides small labels"]];
+let LO={id:"comfy",t:0};try{const x=JSON.parse(localStorage.getItem("wc_layout")||"null");if(x&&x.id)LO={id:x.id,t:+x.t||0}}catch(e){}
+const saveLO=()=>{try{localStorage.setItem("wc_layout",JSON.stringify(LO))}catch(e){}};
+const applyLO=id=>{const r=document.documentElement;id&&id!="comfy"?r.setAttribute("data-lo",id):r.removeAttribute("data-lo")};applyLO(LO.id);
+function mergeLayout(d){if(d&&d.id&&(+d.t||0)>LO.t){LO={id:d.id,t:+d.t};saveLO();applyLO(LO.id);return true}return false}
+function themeUI(){
+ const chip=t=>`<button class="th${TH.id==t.id?" on":""}" data-th="${t.id}" style="background:${t.bg};color:${t.ink};border-color:${t.acc}"><i style="background:${t.acc}"></i>${t.name}</button>`;
+ const html=`<h3>Layout</h3><div class="tg">${LOL.map(([id,n,d])=>`<button class="th${LO.id==id?" on":""}" data-lob="${id}" style="background:var(--card);color:var(--ink);border-color:var(--acc);display:block"><b>${n}</b><br><small style="font-weight:400">${d}</small></button>`).join("")}</div><h3>Design style</h3><div class="tg">${DSL.map(([id,n,d])=>`<button class="th${DS.id==id?" on":""}" data-dsb="${id}" style="background:var(--card);color:var(--ink);border-color:var(--acc);display:block"><b>${n}</b><br><small style="font-weight:400">${d}</small></button>`).join("")}</div><h3>Theme</h3><div class="tg"><button class="th${TH.id=="auto"?" on":""}" data-th="auto" style="background:var(--card);color:var(--ink);border-color:var(--line)"><i style="background:var(--acc)"></i>Auto (system)</button></div><p class="sub">Light</p><div class="tg">${THEMES.filter(t=>t.m=="l").map(chip).join("")}</div><p class="sub">Dark</p><div class="tg">${THEMES.filter(t=>t.m=="d").map(chip).join("")}</div><div id="cuw"></div><p class="sub">Your theme is saved on this device, in the exported JSON and in the Drive sync file.</p>`;
+ const h=[...$("prog").querySelectorAll("h3")].find(x=>x.textContent.startsWith("Per country"));
+ if(h)h.insertAdjacentHTML("beforebegin",html);else $("prog").insertAdjacentHTML("beforeend",html);renderCu();$("prog").querySelectorAll("[data-dsb]").forEach(b=>b.onclick=()=>{DS={id:b.dataset.dsb,t:Date.now()};saveDS();applyDS(DS.id);$("prog").querySelectorAll("[data-dsb]").forEach(x=>x.classList.toggle("on",x===b));autoSync()});$("prog").querySelectorAll("[data-lob]").forEach(b=>b.onclick=()=>{LO={id:b.dataset.lob,t:Date.now()};saveLO();applyLO(LO.id);$("prog").querySelectorAll("[data-lob]").forEach(x=>x.classList.toggle("on",x===b));autoSync()});
+ $("prog").querySelectorAll("[data-th]").forEach(b=>b.onclick=()=>{TH={id:b.dataset.th,t:Date.now(),cu:TH.cu||{}};saveTheme();applyTheme(TH.id);
+  $("prog").querySelectorAll("[data-th]").forEach(x=>x.classList.toggle("on",x===b));renderCu();autoSync()})}
+const KEY="wc_events";let EV=[];try{EV=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(EV))}catch(e){}};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+function log(o){EV.push({id:uid(),t:Date.now(),...o});save()}
+function exp(){const j=JSON.stringify({app:"world-capitals",v:2,resetAt:RESET,theme:TH,design:DS,layout:LO,exported:new Date().toISOString(),summary:{capital:S("cap"),flag:S("flag"),continent:S("cont"),city:S("city"),streak:streakSum(),plays:EV.filter(e=>e.type=="play").length,reviews:EV.filter(e=>e.type=="review").length},events:EV});const n="capitals-progress-"+new Date().toISOString().slice(0,10)+".json";
+ if(window.Android&&Android.saveFile)Android.saveFile(n,j);else{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([j],{type:"application/json"}));a.download=n;a.click()}}
+function imp(f){const r=new FileReader();r.onload=()=>{let m;try{const o=JSON.parse(r.result);mergeTheme(o.theme);mergeDesign(o.design);mergeLayout(o.layout);const mp=new Map(EV.map(e=>[e.id,e]));let n=0;(o.events||[]).forEach(e=>{if(e&&e.id&&e.t>RESET){n+=putEv(mp,e)}});EV=[...mp.values()].sort((a,b)=>a.t-b.t);save();m=n+" new records merged."}catch(x){m="Invalid file."}prog();list($("s").value);$("msg").textContent=m};r.readAsText(f)}
+function S(m){const a=EV.filter(e=>e.type=="answer"&&(e.mode||"cap")==m),ok=a.filter(e=>e.ok).length,q=EV.filter(e=>e.type=="quiz"&&(e.mode||"cap")==m);return{n:a.length,ok,acc:a.length?Math.round(ok/a.length*100):0,quizzes:q.length,best:q.length?Math.max(...q.map(e=>e.score)):0}}
+const pct=(r,w)=>r+w?Math.round(r/(r+w)*100)+"%":"–";
+function prog(){
+ const pl=EV.filter(e=>e.type=="play"),C=S("cap"),Fl=S("flag"),Co=S("cont"),Ci=S("city"),tn=C.n+Fl.n+Co.n+Ci.n,ta=tn?Math.round((C.ok+Fl.ok+Co.ok+Ci.ok)/tn*100):0;
+ const by={};D.forEach(d=>by[d.c]={d,p:0,rv:0,cr:0,cw:0,fr:0,fw:0,tr:0,tw:0,yr:0,yw:0});
+ pl.forEach(e=>{const d=D.find(x=>x.c==e.item||x.k==e.item||(x.cities||[]).includes(e.item));if(d)by[d.c].p++});
+ EV.filter(e=>e.type=="review").forEach(e=>{if(by[e.item])by[e.item].rv++});
+ EV.filter(e=>e.type=="answer").forEach(e=>{const x=by[e.item];if(x)x[(e.mode=="flag"?"f":e.mode=="cont"?"t":e.mode=="city"?"y":"c")+(e.ok?"r":"w")]++});
+ const acc=x=>{const n=x.cr+x.cw+x.fr+x.fw+x.tr+x.tw+x.yr+x.yw;return n?(x.cr+x.fr+x.tr+x.yr)/n:-1};
+ const rows=Object.values(by).filter(x=>x.p||x.rv||acc(x)>=0).sort((a,b)=>acc(a)-acc(b));
+ const st=(n,l)=>`<div class="st"><b>${n}</b>${l}</div>`;
+ const card=(t,s)=>`<div class="mc"><b>${t}</b><div class="pb"><i style="width:${s.acc}%"></i></div><span>${s.acc}% correct · ${s.ok}/${s.n} answers · ${s.quizzes} quizzes finished · best ${s.best}/10</span></div>`;
+ $("prog").innerHTML=`<div class="stats">${st(pl.length,"Audio plays")}${st(EV.filter(e=>e.type=="review").length,"Reviews")}${st(ta+"%","Overall accuracy")}${st(rows.length+"/"+D.length,"Countries practiced")}</div>${card("🏛️ Capital Quiz",C)}${card("🚩 Flag Quiz",Fl)}${card("🌍 Continent Quiz",Co)}${card("🏙️ City Quiz",Ci)}<div class="row"><button class="btn pri" id="xbtn">Export JSON</button><label class="btn">Import JSON<input type="file" id="im" accept=".json,application/json" hidden></label><button class="btn" id="rs">Reset data</button></div><p class="sub" id="msg">Saved automatically on this device. Importing merges records from another device without duplicates.</p><h3>Per country (weakest first)</h3>`+(rows.length?`<div class="tw"><table><tr><th>Country / Capital</th><th>Plays</th><th>Reviewed</th><th>Capital quiz</th><th>Flag quiz</th><th>Continent quiz</th><th>City quiz</th></tr>${rows.map(x=>`<tr><td>${x.d.f} ${x.d.c} (<bdi dir="rtl">${x.d.cf}</bdi>)<br><small>${x.d.k}</small></td><td>${x.p}</td><td>${x.rv}</td><td>${pct(x.cr,x.cw)}<br><small>${x.cr}✓ ${x.cw}✗</small></td><td>${pct(x.fr,x.fw)}<br><small>${x.fr}✓ ${x.fw}✗</small></td><td>${pct(x.tr,x.tw)}<br><small>${x.tr}✓ ${x.tw}✗</small></td><td>${pct(x.yr,x.yw)}<br><small>${x.yr}✓ ${x.yw}✗</small></td></tr>`).join("")}</table></div>`:'<p class="sub">No activity yet.</p>')+`<h3>Recent quizzes</h3>`+(EV.filter(e=>e.type=="quiz").slice(-10).reverse().map(e=>`<div class="row"><span>${e.mode=="flag"?"🚩 Flag":e.mode=="cont"?"🌍 Continent":e.mode=="city"?"🏙️ City":"🏛️ Capital"} · ${new Date(e.t).toLocaleString()}</span><b>${e.score}/${e.total}</b></div>`).join("")||'<p class="sub">No quizzes yet.</p>');
+ $("xbtn").onclick=exp;$("im").onchange=e=>{if(e.target.files[0])imp(e.target.files[0])};
+ $("rs").onclick=askReset;themeUI();
+}
+let RESET=0;try{RESET=+(localStorage.getItem("wc_reset")||0)}catch(e){}
+const NATIVE=!!(window.Android&&Android.readSync);
+const NP={};window.__nat=(id,ok,t)=>{const q=NP[id];delete NP[id];if(q){ok?q.res(t):q.rej(new Error(t||"fail"))}};
+const nat=(fn,...a)=>new Promise((res,rej)=>{const id=uid(),to=setTimeout(()=>{delete NP[id];rej(new Error("timeout"))},20000);NP[id]={res:v=>{clearTimeout(to);res(v)},rej:e=>{clearTimeout(to);rej(e)}};Android[fn](...a,id)});
+let syncing=false,lastTry=0,SMSG="";
+function setSync(msg,err){SMSG=msg;const b=$("sbar");if(b){b.hidden=!err;b.textContent=err?msg:""}const st=$("sst");if(st)st.textContent=msg}
+async function autoSync(){
+ if(!NATIVE||!Android.hasSync()||syncing)return;
+ syncing=true;lastTry=Date.now();setSync("Syncing…");
+ try{
+  const txt=await nat("readSync");let o={events:[],resetAt:0};
+  if(txt&&txt.trim()){o=JSON.parse(txt);if(!Array.isArray(o.events))throw new Error("bad file")}
+  if((+o.resetAt||0)>RESET){RESET=+o.resetAt;try{localStorage.setItem("wc_reset",String(RESET))}catch(e){}}
+  mergeTheme(o.theme);mergeDesign(o.design);mergeLayout(o.layout);const mp=new Map();[...EV,...o.events].forEach(e=>{if(e&&e.id&&e.t>RESET)putEv(mp,e)});
+  EV=[...mp.values()].sort((a,b)=>a.t-b.t);save();
+  await nat("writeSync",JSON.stringify({app:"world-capitals",v:2,resetAt:RESET,theme:TH,design:DS,layout:LO,exported:new Date().toISOString(),summary:{capital:S("cap"),flag:S("flag"),continent:S("cont"),city:S("city"),streak:streakSum()},events:EV}));
+  setSync("Last synced: "+new Date().toLocaleString());
+  list($("s").value);if(!$("prog").hidden)prog();
+ }catch(e){setSync("Sync failed. Check your internet connection. You can keep using the app and it will sync next time it opens.",true)}
+ syncing=false}
+setTimeout(autoSync,400);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&Date.now()-lastTry>60000)autoSync()});
+window.addEventListener("online",()=>{if(Date.now()-lastTry>5000)autoSync()});
+window.__picked=()=>{if(!$("set").hidden)settings();autoSync()};
+function settings(){
+ const has=NATIVE&&Android.hasSync();
+ $("set").innerHTML=`<h3>Google Drive sync</h3>`+(NATIVE?`<p class="sub">Your progress syncs automatically with a JSON file on Google Drive every time the app opens. On each phone, create the file once or choose the existing one.</p><div class="mc"><b>Status</b><span id="sst">${has?(SMSG||"Sync file connected."):"No sync file selected."}</span></div><div class="row"><button class="btn pri" id="sn">Create sync file</button><button class="btn" id="so">Choose existing sync file</button></div><div class="row"><button class="btn" id="sy"${has?"":" disabled"}>Sync now</button><button class="btn" id="sd"${has?"":" disabled"}>Disconnect</button></div>`:`<p class="sub">Drive sync is available in the Android app. In a browser, use Export / Import in the Profile tab.</p>`)+`<h3>Data</h3><div class="row"><button class="btn" id="sr">Reset all data</button></div>`;
+ if(NATIVE){$("sn").onclick=()=>Android.pickSync("create");$("so").onclick=()=>Android.pickSync("open");$("sy").onclick=autoSync;$("sd").onclick=()=>{Android.clearSync();setSync("");settings()}}
+ $("sr").onclick=askReset}
+function askReset(){
+ const m=document.createElement("div");m.className="modal";
+ m.innerHTML=`<div class="mbox" role="dialog" aria-modal="true"><h3>Delete all data?</h3><p>This will permanently erase all progress, quiz results and review counts on this device. This cannot be undone.</p>${NATIVE&&Android.hasSync()?"<p>Drive sync is on, so your other phones will be cleared the next time they sync.</p>":""}<div class="mbtn"><button class="btn" id="mn">No, I don't want to delete</button><button class="btn dng" id="my">Yes, I want to delete</button></div></div>`;
+ document.body.appendChild(m);
+ $("mn").onclick=()=>m.remove();
+ $("my").onclick=()=>{RESET=Date.now();try{localStorage.setItem("wc_reset",String(RESET))}catch(e){}EV=[];save();m.remove();prog();list($("s").value);autoSync()}}
+const ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>';
+const $=id=>document.getElementById(id);
+function say(t,lang){lang=lang||"en-US";const x=t.length<40?t.replace(/[.,]/g,""):t;
+ if(window.Android&&Android.speakLang){Android.speakLang(x,lang);return}
+ if(window.Android&&Android.speak){Android.speak(x);return}
+ try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(x);u.lang=lang;u.rate=lang=="en-US"?.85:.9;speechSynthesis.speak(u)}catch(e){}}
+const nm=(en,fa)=>`<span class="nm">${en} (<bdi dir="rtl">${fa}</bdi>)</span>`;
+const spk=t=>`<span class="spk" role="button" tabindex="0" aria-label="Pronounce ${t}" data-say="${t}">${ICON}</span>`;
+document.addEventListener("click",e=>{const s=e.target.closest("[data-say]");if(s){e.stopPropagation();say(s.dataset.say);log({type:"play",item:s.dataset.say})}},true);
+const WT={Georgia:"Georgia (country)",Ireland:"Republic of Ireland"},wt=d=>WT[d.c]||d.c;
+let WK={};try{WK=JSON.parse(localStorage.getItem("wc_wiki")||"{}")}catch(e){}
+const RV=c=>EV.filter(e=>e.type=="review"&&e.item==c).length;
+const esc=t=>t.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const paras=p=>((p&&p.extract)||"").split(/\n+/).map(x=>x.trim()).filter(Boolean).slice(0,2);
+const PEND={};window.__cb=(id,t)=>{const q=PEND[id];delete PEND[id];if(q){if(t==null)q.rej(new Error("net"));else{try{q.res(JSON.parse(t))}catch(e){q.rej(e)}}}};
+const getJSON=u=>window.Android&&Android.httpGet?new Promise((res,rej)=>{const id=uid();PEND[id]={res,rej};Android.httpGet(u,id)}):fetch(u).then(r=>r.json());
+async function api(lang,title){const j=await getJSON(`https://${lang}.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=extracts${lang=="en"?"%7Clanglinks&lllang=fa&lllimit=1":""}&exintro=1&explaintext=1&titles=${encodeURIComponent(title)}`);return Object.values(j.query.pages)[0]}
+function show(i,loading){const d=D[i],w=WK[d.c]||{};
+ const fill=(id,a,url)=>{const el=$(id);if(!el)return;el.innerHTML=a&&a.length?a.map(x=>`<p>${esc(x)}</p>`).join("")+'<small>Source: Wikipedia, CC BY-SA 4.0</small>':loading?"Loading…":`Couldn't load. Check your internet connection or <a href="${url}" target="_blank" rel="noopener">open Wikipedia</a>.`};
+ fill("we"+i,w.en,"https://en.wikipedia.org/wiki/"+encodeURIComponent(wt(d)));
+ fill("wf"+i,w.fa,"https://fa.wikipedia.org/w/index.php?search="+encodeURIComponent(d.cf))}
+async function loadWiki(i){const d=D[i];show(i,true);if(WK[d.c]&&WK[d.c].en&&WK[d.c].en.length&&WK[d.c].fa&&WK[d.c].fa.length)return;
+ try{const e=await api("en",wt(d)),en=paras(e),ft=e.langlinks&&e.langlinks[0]?e.langlinks[0]["*"]:null;let fa=[];if(ft)fa=paras(await api("fa",ft));
+  if(en.length){WK[d.c]={en,fa};try{localStorage.setItem("wc_wiki",JSON.stringify(WK))}catch(x){}}}catch(x){}
+ show(i)}
+document.addEventListener("toggle",e=>{const t=e.target;if(t.classList&&t.classList.contains("wk")&&t.open)loadWiki(+t.dataset.i)},true);
+document.addEventListener("click",e=>{
+ const t=e.target.closest("[data-tts]");
+ if(t){e.stopPropagation();const d=D[+t.dataset.tts],w=WK[d.c];const fa=t.dataset.lang=="fa-IR",arr=w&&(fa?w.fa:w.en);if(arr&&arr.length)say(arr.join(" ").replace(/\([^)]*\)/g,"").slice(0,3900),fa?"fa-IR":"en-US");else say("Wikipedia text is not loaded yet.");log({type:"play",item:d.c});return}
+ const b=e.target.closest("[data-rv]");
+ if(b){log({type:"review",item:b.dataset.rv});const el=document.querySelector('[data-b="'+b.dataset.i+'"]');if(el)el.textContent=RV(b.dataset.rv)}},true);
+function list(q){q=q.toLowerCase();const cnt={};EV.forEach(e=>{if(e.type=="review")cnt[e.item]=(cnt[e.item]||0)+1});
+ $("list").innerHTML=D.filter(d=>!q||d.c.toLowerCase().includes(q)||d.k.toLowerCase().includes(q)).map(d=>{const i=D.indexOf(d);return `<div class="row"><div class="lh"><div class="cell">${spk(d.c)}<div><span class="lbl">Country</span><div class="nr"><span class="fe">${d.f||""}</span> ${nm(d.c,d.cf)} <span class="bd" data-b="${i}" title="Times reviewed">${cnt[d.c]||0}</span></div><div class="ct">${d.ct}</div></div></div><button class="btn sm" data-rv="${d.c}" data-i="${i}">Reviewed</button></div>${hist(d)}<div class="cell">${spk(d.k)}<div><span class="lbl">Capital</span>${nm(d.k,d.kf)}</div></div><details class="wk" data-i="${i}"><summary>Wikipedia</summary><div class="boxes"><div class="wb"><div class="wh"><b>English Wikipedia</b><span class="spk" role="button" tabindex="0" aria-label="Read aloud" data-tts="${i}">${ICON}</span></div><div class="wt" id="we${i}">Loading…</div></div><div class="wb"><div class="wh"><b>Persian Wikipedia</b><span class="spk" role="button" tabindex="0" aria-label="Read aloud in Persian" data-tts="${i}" data-lang="fa-IR">${ICON}</span></div><div class="wt" dir="rtl" id="wf${i}">Loading…</div></div></div></details><div class="cb"><span class="lbl">Cities (${d.cities.length})</span><div class="chips">${d.cities.map(c=>`<span class="chip">${cn(c)}${spk(c)}</span>`).join("")}</div></div></div>`}).join("")||'<p class="sub">No matches.</p>'}
+$("s").oninput=e=>list(e.target.value);list("");
+function tab(n){$("learn").hidden=n!=1;$("quiz").hidden=n!=2;$("prog").hidden=n!=3;$("set").hidden=n!=4;$("stk").hidden=n!=5;[1,2,3,4,5].forEach(k=>$("t"+k).classList.toggle("on",n==k));if(n==1)list($("s").value);if(n==2)start();if(n==3)prog();if(n==4)settings();if(n==5)streakUI()}
+$("t1").onclick=()=>tab(1);$("t2").onclick=()=>tab(2);$("t3").onclick=()=>tab(3);$("t4").onclick=()=>tab(4);
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+let Q,i,score,done,mode="cap";
+const MODES=[["cap","Capitals"],["flag","Flags"],["cont","Continents"],["city","Cities"]];
+const CONTS=Object.keys(CONT),pick=a=>a[Math.floor(Math.random()*a.length)];
+function contQ(){const used=new Set();return shuf([...CONTS,...CONTS]).slice(0,10).map(c=>{const all=D.filter(x=>x.ct==c),pool=all.filter(x=>!used.has(x)),d=pick(pool.length?pool:all);used.add(d);return d})}
+function start(m){if(m)mode=m;Q=mode=="cont"?contQ():mode=="city"?shuf(D.filter(x=>x.cities.length)).slice(0,10):shuf(D).slice(0,10);i=0;score=0;ask()}
+const head=()=>`<div class="modes">${MODES.map(([k,l])=>`<button class="tab ${k==mode?"on":""}" data-m="${k}">${l}</button>`).join("")}</div>`;
+const bind=()=>document.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>start(b.dataset.m));
+function ask(){
+  if(i>=Q.length){log({type:"quiz",mode,score,total:Q.length});$("quiz").innerHTML=head()+`<div class="q res"><b>${score} / ${Q.length}</b><p>${score>=9?"Excellent!":score>=6?"Good job!":"Keep practicing!"}</p><button class="btn pri" id="again">Play again</button></div>`;$("again").onclick=()=>start();bind();return}
+  const d=Q[i],f=mode=="flag",cm=mode=="cont",ci=mode=="city",cy=ci?pick(d.cities):"";done=false;
+  const opts=cm?shuf([d,...shuf(CONTS.filter(c=>c!=d.ct)).slice(0,3).map(c=>pick(D.filter(x=>x.ct==c)))]):shuf([d,...shuf(D.filter(x=>x!==d)).slice(0,3)]);
+  $("quiz").innerHTML=head()+`<div class="q"><div class="bar"><i style="width:${i/Q.length*100}%"></i></div><div class="meta"><span>Question ${i+1} of ${Q.length}</span><span>Score: ${score}</span></div>${ci?`<div class="cbig">🏙️ ${cy} ${spk(cy)}</div>${CFA[cy]?`<div class="cfa"><bdi dir="rtl">${CFA[cy]}</bdi></div>`:""}<div class="qt" style="font-size:18px">In which country is this city?</div>`:cm?`<div class="cbig">🌍 ${d.ct} ${spk(d.ct)}</div><div class="qt" style="font-size:18px">Which of these countries is in this continent?</div>`:`<div class="qt">${f?"Which flag belongs to":"What is the capital of"} ${nm(d.c,d.cf)} ${spk(d.c)}</div><div class="ct">${d.ct}</div>`}<div class="${f?"fg":""}">${opts.map((o,j)=>cm||ci?`<div class="opt" data-j="${j}"><span>${nm(o.c,o.cf)}</span>${spk(o.c)}</div>`:f?`<div class="opt fl" data-j="${j}">${o.f}</div>`:`<div class="opt" data-j="${j}"><span>${nm(o.k,o.kf)}</span>${spk(o.k)}</div>`).join("")}</div><div class="fb" id="fb"></div><div class="ex" id="ex" hidden></div><button class="btn pri" id="nx" hidden>${i==Q.length-1?"Finish":"Next"}</button></div>`;
+  bind();
+  document.querySelectorAll(".opt").forEach(el=>el.onclick=()=>{
+    if(done)return;done=true;const o=opts[el.dataset.j];
+    document.querySelectorAll(".opt").forEach((x,j)=>{x.classList.add("lock");if(opts[j]===d)x.classList.add("ok")});
+    log({type:"answer",mode,item:d.c,ok:o===d,...(ci?{city:cy}:{})});
+    if(o===d){score++;$("fb").textContent="Correct!"}else{el.classList.add("bad");$("fb").textContent="Not quite. The answer is "+(cm||ci?d.c:f?d.f:d.k)+"."}
+    const ex3=x=>x.cities.filter(c=>c!=cy).slice(0,3).join(", "),ex3v=x=>x.cities.filter(c=>c!=cy).slice(0,3).map(cn).join(", ");
+    const P=x=>ci?(x===d?`${cy} is a city in ${x.c}.`:`${x.c} is not the country of ${cy}, which is in ${d.c}. Cities in ${x.c} include ${ex3(x)}.`):cm?`${x.c} is in ${x.ct}${x===d?"":", not in "+d.ct}.`:f?`This flag belongs to ${x.c}, whose capital is ${x.k}${x===d?"":", not the flag of "+d.c}.`:`${x.k} is the capital of ${x.c}${x===d?"":", not "+d.c}.`;
+    const li=opts.map(x=>{const g=x===d;const tx=ci?(g?`${cn(cy)} is a city in ${nm(x.c,x.cf)}.`:`${nm(x.c,x.cf)} is not the country of ${cn(cy)}, which is in ${nm(d.c,d.cf)}. Cities there include ${ex3v(x)}.`):cm?`${nm(x.c,x.cf)} is in ${x.ct}${g?"":", not in "+d.ct}.`:f?`${x.f} is the flag of ${nm(x.c,x.cf)}, whose capital is ${nm(x.k,x.kf)}.`:`${nm(x.k,x.kf)} is the capital of ${nm(x.c,x.cf)}${g?"":", not "+d.c}.`;return `<li class="${g?"g":x===o?"b":""}">${g?"✓":"✗"} ${spk(P(x))} ${tx}${x===o?" <b>(your choice)</b>":""}</li>`}).join("");
+    $("ex").innerHTML=`<b>Explanation</b> ${spk(opts.map(P).join(" "))} <small>(tap to hear all)</small><ul>${li}</ul>`;$("ex").hidden=false;
+    $("nx").hidden=false;$("nx").onclick=()=>{i++;ask()};$("ex").scrollIntoView({behavior:"smooth",block:"nearest"})});
+}
+
+/* ---- streak & screen time ---- */
+const DEV=(()=>{try{let d=localStorage.getItem("wc_dev");if(!d){d=Math.random().toString(36).slice(2,8);localStorage.setItem("wc_dev",d)}return d}catch(e){return"x"}})();
+const dk=t=>{const d=new Date(t);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const fmtT=sec=>sec<3600?Math.floor(sec/60)+"m":Math.floor(sec/3600)+"h "+String(Math.floor(sec%3600/60)).padStart(2,"0")+"m";
+let ses=null,bg=false,CM=new Date();CM.setDate(1);
+function putEv(mp,e){const o=mp.get(e.id);if(!o){mp.set(e.id,e);return 1}if(e.type=="screen"&&e.sec>o.sec)o.sec=e.sec;return 0}
+const streakSum=()=>{const x=streakInfo();return{current:x.cur,best:x.best,activeDays:x.total}};
+function sesStart(){const n=Date.now();ses={id:"scr-"+DEV+"-"+n,t:n,day:dk(n),sec:0}}
+function sesFlush(){if(!ses||!ses.sec)return;let e=EV.find(x=>x.id==ses.id);if(!e){e={id:ses.id,t:ses.t,type:"screen",day:ses.day,sec:0};EV.push(e)}e.sec=ses.sec;save()}
+function dayTotals(){const m={};EV.forEach(e=>{if(e.type=="screen")m[e.day]=(m[e.day]||0)+e.sec});return m}
+function streakInfo(){const m=dayTotals(),ok=k=>(m[k]||0)>=60;let cur=0;const d=new Date();if(!ok(dk(d)))d.setDate(d.getDate()-1);
+ while(ok(dk(d))){cur++;d.setDate(d.getDate()-1)}
+ const days=Object.keys(m).filter(ok).sort();let best=0,run=0,prev=null;
+ days.forEach(k=>{const t=new Date(k+"T00:00:00");run=prev&&Math.round((t-prev)/864e5)==1?run+1:1;prev=t;best=Math.max(best,run)});
+ return{m,cur,best,total:days.length}}
+function streakPop(n){let p=$("skp");if(!p){document.body.insertAdjacentHTML("beforeend",'<div class="pop" id="skp" hidden><div class="pbx"><div>🔥</div><h2>You completed today!</h2><p id="skn"></p><button class="btn pri" id="sko">Continue</button></div></div>');p=$("skp");$("sko").onclick=()=>{p.hidden=true}}
+ $("skn").textContent="Current streak: "+n+(n==1?" day":" days");p.hidden=false}
+function sesTick(){
+ if(document.hidden||bg)return;
+ const now=Date.now();if(!ses||dk(now)!=ses.day){sesFlush();sesStart()}
+ const before=dayTotals()[ses.day]||0,saved=(EV.find(x=>x.id==ses.id)||{sec:0}).sec;
+ ses.sec+=1;const live=before-saved+ses.sec;
+ if(ses.sec%10==0)sesFlush();
+ if(live>=60&&live-1<60){let seen="";try{seen=localStorage.getItem("wc_pop")}catch(e){}
+  if(seen!=ses.day){try{localStorage.setItem("wc_pop",ses.day)}catch(e){}sesFlush();streakPop(streakInfo().cur);if(!$("stk").hidden)streakUI()}}}
+function streakUI(){
+ sesFlush();const S=streakInfo(),m=S.m,y=CM.getFullYear(),mo=CM.getMonth(),first=new Date(y,mo,1).getDay(),n=new Date(y,mo+1,0).getDate(),today=dk(Date.now());
+ let cells="";for(let i=0;i<first;i++)cells+="<div></div>";
+ for(let d=1;d<=n;d++){const k=y+"-"+String(mo+1).padStart(2,"0")+"-"+String(d).padStart(2,"0"),on=(m[k]||0)>=60;
+  cells+=`<div class="cd${on?" on":""}${k==today?" td":""}">${d}${on?`<b>${Math.max(1,Math.floor(m[k]/60))}<i>min</i></b>`:""}</div>`}
+ $("stk").innerHTML=`<div class="sk"><div class="big">🔥 ${S.cur}</div><div>day streak<small>Best: ${S.best} · Active days: ${S.total}</small><small>Today: ${fmtT(m[today]||0)} (1 minute keeps your streak)</small></div></div>
+ <div class="calh"><button class="btn" id="pm">‹</button><b>${CM.toLocaleString("en-US",{month:"long"})} ${y}</b><button class="btn" id="nm2">›</button></div>
+ <div class="cal">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(x=>`<div class="cw">${x}</div>`).join("")}${cells}</div>
+ <p class="sub">The number in a highlighted day is your screen time in minutes.</p>`;
+ $("pm").onclick=()=>{CM.setMonth(CM.getMonth()-1);streakUI()};$("nm2").onclick=()=>{CM.setMonth(CM.getMonth()+1);streakUI()}}
+window.__vis=v=>{bg=!v;if(!v){sesFlush();autoSync()}};
+document.addEventListener("visibilitychange",()=>{if(document.hidden){sesFlush();autoSync()}});
+$("t5").onclick=()=>tab(5);
+if(!document.hidden)sesStart();setInterval(sesTick,1000);
+</script>
+</body>
+</html>
